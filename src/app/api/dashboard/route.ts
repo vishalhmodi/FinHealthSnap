@@ -1,0 +1,103 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth';
+import { sortQuarterLabels } from '@/lib/utils';
+
+// GET /api/dashboard — aggregated financial health data for charts
+export async function GET() {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const quarters = await prisma.quarter.findMany({
+    where: { userId: user.userId },
+    include: {
+      balances: { 
+        include: { 
+          account: { 
+            include: { category: true, institution: true, owner: true } 
+          } 
+        } 
+      },
+      customItems: true,
+    },
+    orderBy: { snapshotDate: 'asc' },
+  });
+
+  const sorted = sortQuarterLabels(quarters.map((q) => q.label));
+
+  const trends = sorted.map((label) => {
+    const q = quarters.find((x) => x.label === label)!;
+
+    const accountAssets = q.balances.reduce((sum, b) => sum + b.amount, 0);
+    const customAssets = q.customItems
+      .filter((c) => c.itemType === 'ASSET')
+      .reduce((sum, c) => sum + c.amount, 0);
+    const customLiabilities = q.customItems
+      .filter((c) => c.itemType === 'LIABILITY')
+      .reduce((sum, c) => sum + c.amount, 0);
+
+    const totalAssets = accountAssets + customAssets;
+    const totalLiabilities = customLiabilities;
+    const netWorth = totalAssets - totalLiabilities;
+
+    // Breakdowns
+    const categoryMap: Record<string, number> = {};
+    const institutionMap: Record<string, number> = {};
+    const ownerMap: Record<string, number> = {};
+
+    for (const b of q.balances) {
+      const cat = b.account.category.name;
+      categoryMap[cat] = (categoryMap[cat] ?? 0) + b.amount;
+
+      const inst = b.account.institution.name;
+      institutionMap[inst] = (institutionMap[inst] ?? 0) + b.amount;
+
+      const owner = b.account.owner.name;
+      ownerMap[owner] = (ownerMap[owner] ?? 0) + b.amount;
+    }
+
+    // Detailed Items for Waterfall
+    const items: Array<{ name: string; type: 'ASSET' | 'LIABILITY'; amount: number }> = [];
+
+    for (const b of q.balances) {
+      if (b.amount === 0) continue;
+      items.push({
+        name: `${b.account.category.name} - ${b.account.owner.name}`,
+        type: 'ASSET',
+        amount: b.amount,
+      });
+    }
+
+    for (const c of q.customItems) {
+      if (c.amount === 0) continue;
+      items.push({
+        name: c.name,
+        type: c.itemType,
+        amount: c.amount,
+      });
+    }
+
+    items.sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'ASSET' ? -1 : 1;
+      return b.amount - a.amount;
+    });
+
+    return {
+      label: q.label,
+      quarterId: q.id,
+      snapshotDate: q.snapshotDate,
+      totalAssets,
+      totalLiabilities,
+      netWorth,
+      categoryBreakdown: categoryMap,
+      institutionBreakdown: institutionMap,
+      ownerBreakdown: ownerMap,
+      items,
+    };
+  });
+
+  // Latest quarter summary
+  const latest = trends[trends.length - 1] ?? null;
+
+  return NextResponse.json({ trends, latest });
+}

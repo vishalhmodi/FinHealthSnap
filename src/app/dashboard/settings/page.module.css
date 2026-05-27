@@ -1,0 +1,23 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 1000px; }
+.header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+.header h1 { margin-bottom: 4px; }
+.header p { font-size: 0.875rem; color: var(--text-muted); }
+.section { padding: 28px; }
+.sectionTitle { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 16px; }
+.infoGrid { display: flex; flex-direction: column; gap: 0; }
+.infoRow { display: flex; align-items: center; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--glass-border); }
+.infoRow:last-child { border-bottom: none; }
+.infoLabel { min-width: 130px; font-size: 0.85rem; color: var(--text-muted); }
+.infoValue { font-size: 0.85rem; color: var(--text-primary); font-weight: 500; }
+.about { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+.featureList { display: flex; flex-direction: column; gap: 8px; }
+.featureItem { font-size: 0.8125rem; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px solid var(--glass-border); }
+.featureItem:last-child { border-bottom: none; }
+
+/* Presets Grid */
+.presetsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.itemList { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; min-height: 100px; max-height: 250px; overflow-y: auto; }
+.itemRow { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--bg-input); border: 1px solid var(--glass-border); border-radius: var(--radius-md); font-size: 0.875rem; }
+.emptyText { font-size: 0.85rem; color: var(--text-muted); font-style: italic; padding: 12px; text-align: center; }
+.addForm { display: flex; gap: 8px; }
+

@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Multi-Tenant User Model
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  quarters     Quarter[]
+  categories   AccountCategory[]
+  institutions Institution[]
+  owners       Owner[]
+  accounts     Account[]
+  customItems  CustomAssetLiability[]
+}
+
+// 2. Quarterly Snapshot Metadata
+model Quarter {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String   // e.g. "2025-Q4"
+  snapshotDate DateTime // e.g. 2026-01-26
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  balances    AccountBalance[]
+  customItems CustomAssetLiability[]
+
+  @@unique([userId, label])
+}
+
+// 3. Dynamic Investment Categories
+model AccountCategory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   // e.g. "TFSA", "RRSP", "RESP", "General"
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  accounts Account[]
+
+  @@unique([userId, name])
+}
+
+// 4. Financial Institutions / Banks
+model Institution {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   // e.g. "TD", "RBC", "SunLife", "Manulife"
+  createdAt DateTime @default(now())
+
+  accounts Account[]
+
+  @@unique([userId, name])
+}
+
+// 5. Asset / Liability Owners
+model Owner {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   // e.g. "John", "Jane", "Family", "Kids"
+  createdAt DateTime @default(now())
+
+  accounts Account[]
+
+  @@unique([userId, name])
+}
+
+// 6. Registered Accounts
+model Account {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      AccountCategory @relation(fields: [categoryId], references: [id])
+  institutionId String
+  institution   Institution     @relation(fields: [institutionId], references: [id])
+  ownerId       String
+  owner         Owner           @relation(fields: [ownerId], references: [id])
+  name          String?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+
+  balances AccountBalance[]
+}
+
+// 7. Core Balances per Account per Quarter
+model AccountBalance {
+  id        String   @id @default(uuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  quarterId String
+  quarter   Quarter  @relation(fields: [quarterId], references: [id], onDelete: Cascade)
+  amount    Float    @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([accountId, quarterId])
+}
+
+// 8. Custom Real Estate / Liabilities Panel (right-side panel in Excel)
+model CustomAssetLiability {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quarterId String
+  quarter   Quarter  @relation(fields: [quarterId], references: [id], onDelete: Cascade)
+  name      String   // e.g. "Primary House", "Invest. House-1", "Heloc"
+  detail    String   // e.g. "Equity", "Mortgage", "PrimaryHouse"
+  itemType  String   // "ASSET" or "LIABILITY"
+  amount    Float    // Always positive; sign determined by itemType
+  sortOrder Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
