@@ -20,7 +20,7 @@ export async function GET() {
       },
       customItems: true,
     },
-    orderBy: { snapshotDate: 'asc' },
+    orderBy: { label: 'asc' },
   });
 
   const sorted = sortQuarterLabels(quarters.map((q) => q.label));

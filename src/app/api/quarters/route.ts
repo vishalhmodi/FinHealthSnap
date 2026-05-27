@@ -9,7 +9,7 @@ export async function GET() {
 
   const quartersRaw = await prisma.quarter.findMany({
     where: { userId: user.userId },
-    orderBy: { snapshotDate: 'desc' },
+    orderBy: { label: 'desc' },
     include: {
       balances: true,
       customItems: true
