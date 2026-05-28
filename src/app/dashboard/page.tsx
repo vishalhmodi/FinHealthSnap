@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, Legend, Cell, ReferenceLine, LineChart, Line, PieChart, Pie,
+  BarChart, Bar, Legend, Cell, ReferenceLine, LineChart, Line, PieChart, Pie, LabelList,
 } from 'recharts';
 import styles from './page.module.css';
 import { formatCurrency, formatCurrencyCompact, getChangePercent } from '@/lib/utils';
@@ -385,6 +385,28 @@ export default function DashboardPage() {
                       />
                       <ReferenceLine y={0} stroke="var(--text-muted)" />
                       <Bar dataKey="range" radius={[2, 2, 0, 0]}>
+                        <LabelList 
+                          dataKey="amount" 
+                          content={(props: any) => {
+                            const { x, y, width, height, value } = props;
+                            if (!value) return null;
+                            const isNegative = value < 0;
+                            const textY = isNegative ? y + height + 12 : y - 8;
+                            return (
+                              <text 
+                                x={x + width / 2} 
+                                y={textY} 
+                                fill="var(--text-muted)" 
+                                textAnchor="middle" 
+                                fontSize={10}
+                                fontFamily="var(--font-mono)"
+                                pointerEvents="none"
+                              >
+                                {formatCurrencyCompact(value)}
+                              </text>
+                            );
+                          }}
+                        />
                         {waterfallData.map((entry, index) => (
                           <Cell key={index} fill={entry.fill} fillOpacity={0.85} />
                         ))}
