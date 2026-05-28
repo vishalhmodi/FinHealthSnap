@@ -157,12 +157,9 @@ export default function DashboardPage() {
     : [];
   const donutTotal = donutData.reduce((sum, d) => sum + d.value, 0);
 
-  // Donut Chart 2: Asset vs Liability
+  // Donut Chart 2: Non-Liquid Assets
   const donut2Data = latest 
-    ? [
-        { name: 'Assets', value: latest.totalAssets, fill: '#10b981' },
-        { name: 'Liabilities', value: latest.totalLiabilities, fill: '#ef4444' }
-      ]
+    ? latest.items.filter(i => i.type === 'ASSET').map(i => ({ name: i.name, value: i.amount }))
     : [];
   const donut2Total = donut2Data.reduce((sum, d) => sum + d.value, 0);
 
@@ -317,22 +314,22 @@ export default function DashboardPage() {
               </div>
 
               {/* Donut Charts: Asset Allocation & Distribution */}
-              <div className={`glass-card ${styles.chartCard}`} style={{ gridColumn: '1 / -1' }}>
-                <h2 className={styles.chartTitle}>Asset Allocation & Distribution</h2>
-                <p className={styles.chartSubtitle}>Composition of your liquid investments and overall asset/liability distribution</p>
-                <div className={styles.chartWrapper} style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'space-around' }}>
+              <div className={`glass-card ${styles.chartCard}`}>
+                <h2 className={styles.chartTitle}>Asset Allocation</h2>
+                <p className={styles.chartSubtitle}>Liquid vs Non-Liquid Asset breakdown</p>
+                <div className={styles.chartWrapper} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
                   
                   {/* Donut 1: Liquid Assets */}
-                  <div style={{ flex: '1 1 300px' }}>
+                  <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
                     <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Liquid Assets</h3>
-                    <ResponsiveContainer width="100%" height={260}>
+                    <ResponsiveContainer width="100%" height={220}>
                       <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                         <Pie
                           data={donutData}
                           cx="50%"
                           cy="50%"
-                          innerRadius={65}
-                          outerRadius={95}
+                          innerRadius={45}
+                          outerRadius={75}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
@@ -343,7 +340,7 @@ export default function DashboardPage() {
                             value={formatCurrencyCompact(donutTotal)} 
                             position="center" 
                             fill="var(--text)" 
-                            style={{ fontSize: '1.2rem', fontWeight: 'bold' }} 
+                            style={{ fontSize: '1rem', fontWeight: 'bold' }} 
                           />
                           {donutData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="var(--bg-card)" />
@@ -374,17 +371,17 @@ export default function DashboardPage() {
                     </ResponsiveContainer>
                   </div>
 
-                  {/* Donut 2: Assets vs Liabilities */}
-                  <div style={{ flex: '1 1 300px' }}>
-                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Assets vs Liabilities</h3>
-                    <ResponsiveContainer width="100%" height={260}>
+                  {/* Donut 2: Non-Liquid Assets */}
+                  <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
+                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets</h3>
+                    <ResponsiveContainer width="100%" height={220}>
                       <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
                         <Pie
                           data={donut2Data}
                           cx="50%"
                           cy="50%"
-                          innerRadius={65}
-                          outerRadius={95}
+                          innerRadius={45}
+                          outerRadius={75}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
@@ -392,13 +389,13 @@ export default function DashboardPage() {
                           label={renderCustomizedLabel}
                         >
                           <Label 
-                            value={formatCurrencyCompact(latest ? latest.netWorth : 0)} 
+                            value={formatCurrencyCompact(donut2Total)} 
                             position="center" 
                             fill="var(--text)" 
-                            style={{ fontSize: '1.2rem', fontWeight: 'bold' }} 
+                            style={{ fontSize: '1rem', fontWeight: 'bold' }} 
                           />
                           {donut2Data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} stroke="var(--bg-card)" />
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[(index + 4) % CHART_COLORS.length]} stroke="var(--bg-card)" />
                           ))}
                         </Pie>
                         <Tooltip 
