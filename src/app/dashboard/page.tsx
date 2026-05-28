@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, Legend, Cell, ReferenceLine, LineChart, Line, PieChart, Pie, LabelList,
+  BarChart, Bar, Legend, Cell, ReferenceLine, LineChart, Line, PieChart, Pie, LabelList, Label,
 } from 'recharts';
 import styles from './page.module.css';
 import { formatCurrency, formatCurrencyCompact, getChangePercent } from '@/lib/utils';
@@ -20,6 +20,8 @@ interface TrendPoint {
   categoryBreakdown: Record<string, number>;
   institutionBreakdown: Record<string, number>;
   ownerBreakdown: Record<string, number>;
+  nonLiquidBreakdown: Record<string, number>;
+  liabilityBreakdown: Record<string, number>;
   items: Array<{ name: string; type: 'ASSET' | 'LIABILITY'; amount: number }>;
 }
 
@@ -90,9 +92,24 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  
+  return (
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
+const renderLabelWithExternal = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, fill }: any) => {
+  if (percent < 0.05) return null;
+
+  // Internal Label (Percentage)
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   // External Label (Value)
-  const outerR = outerRadius + 20;
+  const outerR = outerRadius + 15;
   const outerX = cx + outerR * Math.cos(-midAngle * RADIAN);
   const outerY = cy + outerR * Math.sin(-midAngle * RADIAN);
   const textAnchor = Math.cos(-midAngle * RADIAN) >= 0 ? 'start' : 'end';
@@ -102,11 +119,15 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
       <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
         {`${(percent * 100).toFixed(0)}%`}
       </text>
-      <text x={outerX} y={outerY} fill={fill || 'var(--text-muted)'} textAnchor={textAnchor} dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 500, pointerEvents: 'none', fontFamily: 'var(--font-mono)' }}>
+      <text x={outerX} y={outerY} fill={fill || 'var(--text-muted)'} textAnchor={textAnchor} dominantBaseline="central" style={{ fontSize: '0.7rem', fontWeight: 500, pointerEvents: 'none', fontFamily: 'var(--font-mono)' }}>
         {formatCurrencyCompact(value)}
       </text>
     </g>
   );
+};
+
+const truncateLegend = (value: string) => {
+  return value.length > 20 ? value.substring(0, 18) + '...' : value;
 };
 
 export default function DashboardPage() {
@@ -156,6 +177,27 @@ export default function DashboardPage() {
     ? Object.entries(latest.categoryBreakdown).map(([name, value]) => ({ name, value }))
     : [];
   const donutTotal = donutData.reduce((sum, d) => sum + d.value, 0);
+
+  // Donut Chart 2: Non-Liquid Assets and Liabilities
+  let donut2Data: Array<{ name: string; value: number }> = [];
+  if (latest) {
+    if (latest.nonLiquidBreakdown) {
+      donut2Data = donut2Data.concat(
+        Object.entries(latest.nonLiquidBreakdown).map(([name, value]) => ({ name, value }))
+      );
+    }
+    if (latest.liabilityBreakdown) {
+      donut2Data = donut2Data.concat(
+        Object.entries(latest.liabilityBreakdown).map(([name, value]) => ({ name, value }))
+      );
+    }
+  }
+  const donut2Total = donut2Data.reduce((sum, d) => sum + d.value, 0);
+
+  // Calculate Net Non-Liquid Assets
+  const nonLiquidAssetsTotal = latest && latest.nonLiquidBreakdown ? Object.values(latest.nonLiquidBreakdown).reduce((sum, v) => sum + v, 0) : 0;
+  const liabilitiesTotal = latest && latest.liabilityBreakdown ? Object.values(latest.liabilityBreakdown).reduce((sum, v) => sum + v, 0) : 0;
+  const donut2NetTotal = nonLiquidAssetsTotal - liabilitiesTotal;
 
   // Component Waterfall data: Net worth breakdown
   let runningTotal = 0;
@@ -307,52 +349,118 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Donut Chart: Asset Allocation */}
+              {/* Donut Charts: Asset Allocation & Distribution */}
               <div className={`glass-card ${styles.chartCard}`}>
                 <h2 className={styles.chartTitle}>Asset Allocation</h2>
-                <p className={styles.chartSubtitle}>Composition of your investments and assets</p>
-                <div className={styles.chartWrapper}>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                      <Pie
-                        data={donutData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={2}
-                        dataKey="value"
-                        nameKey="name"
-                        labelLine={false}
-                        label={renderCustomizedLabel}
-                      >
-                        {donutData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="var(--bg-card)" />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        content={({ active, payload }) => {
-                          if (!active || !payload?.length) return null;
-                          const data = payload[0];
-                          const percent = donutTotal > 0 ? ((data.value as number) / donutTotal) * 100 : 0;
-                          return (
-                            <div className={styles.chartTooltip}>
-                              <div className={styles.tooltipLabel}>{data.name}</div>
-                              <div className={styles.tooltipRow}>
-                                <span style={{ color: data.payload.fill }}>Amount</span>
-                                <span className="font-mono">{formatCurrency(data.value as number)}</span>
+                <p className={styles.chartSubtitle}>Liquid vs Non-Liquid Asset and Liability breakdown</p>
+                <div className={styles.chartWrapper} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                  
+                  {/* Donut 1: Liquid Assets */}
+                  <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
+                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Liquid Assets</h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                        <Pie
+                          data={donutData}
+                          cx="50%"
+                          cy="45%"
+                          innerRadius={40}
+                          outerRadius={65}
+                          paddingAngle={2}
+                          dataKey="value"
+                          nameKey="name"
+                          labelLine={false}
+                          label={renderLabelWithExternal}
+                        >
+                          <Label 
+                            value={formatCurrencyCompact(donutTotal)} 
+                            position="center" 
+                            fill="var(--text)" 
+                            style={{ fontSize: '1rem', fontWeight: 'bold' }} 
+                            dy={-5}
+                          />
+                          {donutData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="var(--bg-card)" />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          content={({ active, payload }) => {
+                            if (!active || !payload?.length) return null;
+                            const data = payload[0];
+                            const percent = donutTotal > 0 ? ((data.value as number) / donutTotal) * 100 : 0;
+                            return (
+                              <div className={styles.chartTooltip}>
+                                <div className={styles.tooltipLabel}>{data.name}</div>
+                                <div className={styles.tooltipRow}>
+                                  <span style={{ color: data.payload.fill }}>Amount</span>
+                                  <span className="font-mono">{formatCurrency(data.value as number)}</span>
+                                </div>
+                                <div className={styles.tooltipRow}>
+                                  <span style={{ color: data.payload.fill }}>Share</span>
+                                  <span className="font-mono">{percent.toFixed(1)}%</span>
+                                </div>
                               </div>
-                              <div className={styles.tooltipRow}>
-                                <span style={{ color: data.payload.fill }}>Share</span>
-                                <span className="font-mono">{percent.toFixed(1)}%</span>
+                            );
+                          }} 
+                        />
+                        <Legend formatter={truncateLegend} wrapperStyle={{ fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '10px' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Donut 2: Non-Liquid Assets & Liabilities */}
+                  <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
+                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets & Liabilities</h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                        <Pie
+                          data={donut2Data}
+                          cx="50%"
+                          cy="45%"
+                          innerRadius={45}
+                          outerRadius={70}
+                          paddingAngle={2}
+                          dataKey="value"
+                          nameKey="name"
+                          labelLine={false}
+                          label={renderCustomizedLabel}
+                        >
+                          <Label 
+                            value={formatCurrencyCompact(donut2NetTotal)} 
+                            position="center" 
+                            fill="var(--text)" 
+                            style={{ fontSize: '1rem', fontWeight: 'bold' }} 
+                            dy={-5}
+                          />
+                          {donut2Data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[(index + 4) % CHART_COLORS.length]} stroke="var(--bg-card)" />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          content={({ active, payload }) => {
+                            if (!active || !payload?.length) return null;
+                            const data = payload[0];
+                            const percent = donut2Total > 0 ? ((data.value as number) / donut2Total) * 100 : 0;
+                            return (
+                              <div className={styles.chartTooltip}>
+                                <div className={styles.tooltipLabel}>{data.name}</div>
+                                <div className={styles.tooltipRow}>
+                                  <span style={{ color: data.payload.fill }}>Amount</span>
+                                  <span className="font-mono">{formatCurrency(data.value as number)}</span>
+                                </div>
+                                <div className={styles.tooltipRow}>
+                                  <span style={{ color: data.payload.fill }}>Share</span>
+                                  <span className="font-mono">{percent.toFixed(1)}%</span>
+                                </div>
                               </div>
-                            </div>
-                          );
-                        }} 
-                      />
-                      <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingTop: '12px' }} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                            );
+                          }} 
+                        />
+                        <Legend formatter={truncateLegend} wrapperStyle={{ fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '10px' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
                 </div>
               </div>
 
