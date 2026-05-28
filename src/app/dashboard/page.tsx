@@ -391,16 +391,18 @@ export default function DashboardPage() {
                             const { x, y, width, height, value } = props;
                             if (!value) return null;
                             const isNegative = value < 0;
-                            const textY = isNegative ? y + height + 12 : y - 8;
+                            const textX = x + width / 2;
+                            const textY = isNegative ? y + height + 10 : y - 6;
                             return (
                               <text 
-                                x={x + width / 2} 
+                                x={textX} 
                                 y={textY} 
                                 fill="var(--text-muted)" 
-                                textAnchor="middle" 
-                                fontSize={10}
+                                textAnchor={isNegative ? "end" : "start"} 
+                                fontSize={9}
                                 fontFamily="var(--font-mono)"
                                 pointerEvents="none"
+                                transform={`rotate(-45, ${textX}, ${textY})`}
                               >
                                 {formatCurrencyCompact(value)}
                               </text>
