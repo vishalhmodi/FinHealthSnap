@@ -29,7 +29,9 @@ As the developer, you only need to do this once:
 
 ## Part 2: How Your Friend Uses It (User Side)
 
-Your friend does **not** need the GitHub repository. They only need **Docker Desktop** installed on their Mac or Windows machine.
+Your friend does **not** need the GitHub repository. They only need **Docker Desktop** installed on their Mac or Windows machine. 
+
+*(Note: Docker Desktop is 100% free for personal use. Your friend can download it directly from the official website here: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/))*
 
 ### Step 1: Create a Folder for Data
 They create an empty folder on their computer where they want their financial data saved. For example:
