@@ -83,17 +83,29 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 };
 
 const RADIAN = Math.PI / 180;
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: any) => {
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, value, fill }: any) => {
+  if (percent < 0.05) return null;
+
+  // Internal Label (Percentage)
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-  if (percent < 0.05) return null;
+  // External Label (Value)
+  const outerR = outerRadius + 20;
+  const outerX = cx + outerR * Math.cos(-midAngle * RADIAN);
+  const outerY = cy + outerR * Math.sin(-midAngle * RADIAN);
+  const textAnchor = Math.cos(-midAngle * RADIAN) >= 0 ? 'start' : 'end';
   
   return (
-    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
+    <g>
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+      <text x={outerX} y={outerY} fill={fill || 'var(--text-muted)'} textAnchor={textAnchor} dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 500, pointerEvents: 'none', fontFamily: 'var(--font-mono)' }}>
+        {formatCurrencyCompact(value)}
+      </text>
+    </g>
   );
 };
 
