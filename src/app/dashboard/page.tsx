@@ -334,7 +334,7 @@ export default function DashboardPage() {
                         content={({ active, payload }) => {
                           if (!active || !payload?.length) return null;
                           const data = payload[0];
-                          const percent = donutTotal > 0 ? (data.value / donutTotal) * 100 : 0;
+                          const percent = donutTotal > 0 ? ((data.value as number) / donutTotal) * 100 : 0;
                           return (
                             <div className={styles.chartTooltip}>
                               <div className={styles.tooltipLabel}>{data.name}</div>
