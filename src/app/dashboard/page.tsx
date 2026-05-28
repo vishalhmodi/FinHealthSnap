@@ -159,7 +159,7 @@ export default function DashboardPage() {
 
   // Component Waterfall data: Net worth breakdown
   let runningTotal = 0;
-  const waterfallData = latest ? latest.items.map(item => {
+  const waterfallData: Array<{ name: string, amount: number, type: string, range: [number, number], fill: string }> = latest ? latest.items.map(item => {
     const isAsset = item.type === 'ASSET';
     const start = runningTotal;
     const end = isAsset ? runningTotal + item.amount : runningTotal - item.amount;
