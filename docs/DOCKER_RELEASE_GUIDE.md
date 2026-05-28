@@ -33,7 +33,6 @@ Inside that new `FinHealthSnap_App` folder, create a file named `docker-compose.
 **Do NOT use your development compose file!** Paste the following code into it. Notice that it uses `image:` instead of `build: .` so that it doesn't require the source code.
 
 ```yaml
-version: '3.8'
 services:
   finhealthsnap:
     image: finhealthsnap-release:latest
