@@ -362,7 +362,7 @@ export default function DashboardPage() {
                 <p className={styles.chartSubtitle}>Composition of your current net worth</p>
                 <div className={styles.chartWrapper}>
                   <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={waterfallData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                    <BarChart data={waterfallData} margin={{ top: 40, right: 16, left: 0, bottom: 40 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
                       <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
@@ -392,7 +392,7 @@ export default function DashboardPage() {
                             if (!value) return null;
                             const isNegative = value < 0;
                             const textX = x + width / 2;
-                            const textY = isNegative ? y + height + 10 : y - 6;
+                            const textY = isNegative ? y + height + 6 : y - 6;
                             return (
                               <text 
                                 x={textX} 
@@ -402,7 +402,7 @@ export default function DashboardPage() {
                                 fontSize={9}
                                 fontFamily="var(--font-mono)"
                                 pointerEvents="none"
-                                transform={`rotate(-45, ${textX}, ${textY})`}
+                                transform={`rotate(-90, ${textX}, ${textY})`}
                               >
                                 {formatCurrencyCompact(value)}
                               </text>
