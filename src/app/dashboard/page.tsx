@@ -13,6 +13,8 @@ interface TrendPoint {
   label: string;
   quarterId: string;
   totalAssets: number;
+  liquidAssets: number;
+  nonLiquidAssets: number;
   totalLiabilities: number;
   netWorth: number;
   categoryBreakdown: Record<string, number>;
@@ -133,7 +135,8 @@ export default function DashboardPage() {
     : upToLatestTrends.slice(-parseInt(horizon, 10));
 
   const netWorthDelta = prev && latest ? getChangePercent(latest.netWorth, prev.netWorth) : undefined;
-  const assetDelta = prev && latest ? getChangePercent(latest.totalAssets, prev.totalAssets) : undefined;
+  const liquidAssetDelta = prev && latest ? getChangePercent(latest.liquidAssets, prev.liquidAssets) : undefined;
+  const nonLiquidAssetDelta = prev && latest ? getChangePercent(latest.nonLiquidAssets, prev.nonLiquidAssets) : undefined;
   const liabilityDelta = prev && latest ? getChangePercent(latest.totalLiabilities, prev.totalLiabilities) : undefined;
 
   // Donut Chart: Asset categories
@@ -221,11 +224,18 @@ export default function DashboardPage() {
         <>
           <div className={styles.metricsGrid}>
             <MetricCard
-              title="Total Assets"
-              amount={latest.totalAssets}
-              subtitle="Investments + Real Estate"
+              title="Liquid Assets"
+              amount={latest.liquidAssets}
+              subtitle="Investments & Cash"
               type="asset"
-              delta={assetDelta}
+              delta={liquidAssetDelta}
+            />
+            <MetricCard
+              title="Non-Liquid Assets"
+              amount={latest.nonLiquidAssets}
+              subtitle="Real Estate Equity"
+              type="asset"
+              delta={nonLiquidAssetDelta}
             />
             <MetricCard
               title="Total Liabilities"
