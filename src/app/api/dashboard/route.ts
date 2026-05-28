@@ -44,6 +44,7 @@ export async function GET() {
     const institutionMap: Record<string, number> = {};
     const ownerMap: Record<string, number> = {};
     const nonLiquidMap: Record<string, number> = {};
+    const liabilityMap: Record<string, number> = {};
 
     for (const b of q.balances) {
       const cat = b.account.category.name;
@@ -59,6 +60,8 @@ export async function GET() {
     for (const c of q.customItems) {
       if (c.itemType === 'ASSET') {
         nonLiquidMap[c.name] = (nonLiquidMap[c.name] ?? 0) + c.amount;
+      } else if (c.itemType === 'LIABILITY') {
+        liabilityMap[c.name] = (liabilityMap[c.name] ?? 0) + c.amount;
       }
     }
 
@@ -110,6 +113,7 @@ export async function GET() {
       institutionBreakdown: institutionMap,
       ownerBreakdown: ownerMap,
       nonLiquidBreakdown: nonLiquidMap,
+      liabilityBreakdown: liabilityMap,
       items,
     };
   });

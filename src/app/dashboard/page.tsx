@@ -21,6 +21,7 @@ interface TrendPoint {
   institutionBreakdown: Record<string, number>;
   ownerBreakdown: Record<string, number>;
   nonLiquidBreakdown: Record<string, number>;
+  liabilityBreakdown: Record<string, number>;
   items: Array<{ name: string; type: 'ASSET' | 'LIABILITY'; amount: number }>;
 }
 
@@ -158,10 +159,20 @@ export default function DashboardPage() {
     : [];
   const donutTotal = donutData.reduce((sum, d) => sum + d.value, 0);
 
-  // Donut Chart 2: Non-Liquid Assets
-  const donut2Data = latest && latest.nonLiquidBreakdown
-    ? Object.entries(latest.nonLiquidBreakdown).map(([name, value]) => ({ name, value }))
-    : [];
+  // Donut Chart 2: Non-Liquid Assets and Liabilities
+  let donut2Data: Array<{ name: string; value: number }> = [];
+  if (latest) {
+    if (latest.nonLiquidBreakdown) {
+      donut2Data = donut2Data.concat(
+        Object.entries(latest.nonLiquidBreakdown).map(([name, value]) => ({ name, value }))
+      );
+    }
+    if (latest.liabilityBreakdown) {
+      donut2Data = donut2Data.concat(
+        Object.entries(latest.liabilityBreakdown).map(([name, value]) => ({ name, value }))
+      );
+    }
+  }
   const donut2Total = donut2Data.reduce((sum, d) => sum + d.value, 0);
 
   // Component Waterfall data: Net worth breakdown
@@ -317,19 +328,19 @@ export default function DashboardPage() {
               {/* Donut Charts: Asset Allocation & Distribution */}
               <div className={`glass-card ${styles.chartCard}`}>
                 <h2 className={styles.chartTitle}>Asset Allocation</h2>
-                <p className={styles.chartSubtitle}>Liquid vs Non-Liquid Asset breakdown</p>
+                <p className={styles.chartSubtitle}>Liquid vs Non-Liquid Asset and Liability breakdown</p>
                 <div className={styles.chartWrapper} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
                   
                   {/* Donut 1: Liquid Assets */}
                   <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
                     <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Liquid Assets</h3>
-                    <ResponsiveContainer width="100%" height={220}>
-                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                    <ResponsiveContainer width="100%" height={260}>
+                      <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                         <Pie
                           data={donutData}
                           cx="50%"
                           cy="50%"
-                          innerRadius={45}
+                          innerRadius={50}
                           outerRadius={75}
                           paddingAngle={2}
                           dataKey="value"
@@ -372,16 +383,16 @@ export default function DashboardPage() {
                     </ResponsiveContainer>
                   </div>
 
-                  {/* Donut 2: Non-Liquid Assets */}
+                  {/* Donut 2: Non-Liquid Assets & Liabilities */}
                   <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
-                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets</h3>
-                    <ResponsiveContainer width="100%" height={220}>
-                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets & Liabilities</h3>
+                    <ResponsiveContainer width="100%" height={260}>
+                      <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                         <Pie
                           data={donut2Data}
                           cx="50%"
                           cy="50%"
-                          innerRadius={45}
+                          innerRadius={50}
                           outerRadius={75}
                           paddingAngle={2}
                           dataKey="value"
