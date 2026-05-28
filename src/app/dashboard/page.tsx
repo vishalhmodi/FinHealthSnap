@@ -341,9 +341,9 @@ export default function DashboardPage() {
                       <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
                       <Tooltip content={<CustomTooltip />} />
                       <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingTop: '12px' }} />
-                      <Area type="monotone" dataKey="Total Assets" stroke="#10b981" strokeWidth={2} fill="url(#gradAsset)" />
-                      <Area type="monotone" dataKey="Net Worth" stroke="#6366f1" strokeWidth={2.5} fill="url(#gradNetWorth)" />
-                      <Area type="monotone" dataKey="Total Liabilities" stroke="#ef4444" strokeWidth={2} fill="none" strokeDasharray="5 3" />
+                      <Area type="monotone" dataKey="Total Assets" stroke="#10b981" strokeWidth={2} fill="url(#gradAsset)" isAnimationActive={false} />
+                      <Area type="monotone" dataKey="Net Worth" stroke="#6366f1" strokeWidth={2.5} fill="url(#gradNetWorth)" isAnimationActive={false} />
+                      <Area type="monotone" dataKey="Total Liabilities" stroke="#ef4444" strokeWidth={2} fill="none" strokeDasharray="5 3" isAnimationActive={false} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -362,6 +362,7 @@ export default function DashboardPage() {
                       <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
                         <Pie
                           data={donutData}
+                          isAnimationActive={false}
                           cx="50%"
                           cy="45%"
                           innerRadius={40}
@@ -415,6 +416,7 @@ export default function DashboardPage() {
                       <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
                         <Pie
                           data={donut2Data}
+                          isAnimationActive={false}
                           cx="50%"
                           cy="45%"
                           innerRadius={45}
@@ -492,7 +494,7 @@ export default function DashboardPage() {
                         }} 
                       />
                       <ReferenceLine y={0} stroke="var(--text-muted)" />
-                      <Bar dataKey="range" radius={[2, 2, 0, 0]}>
+                      <Bar dataKey="range" radius={[2, 2, 0, 0]} isAnimationActive={false}>
                         <LabelList 
                           dataKey="amount" 
                           content={(props: any) => {
@@ -539,7 +541,7 @@ export default function DashboardPage() {
                       <Tooltip content={<CustomTooltip />} />
                       <Legend wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '12px' }} />
                       {allCategories.map((cat, i) => (
-                        <Line key={cat} type="monotone" dataKey={cat} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} />
+                        <Line key={cat} type="monotone" dataKey={cat} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
@@ -559,7 +561,7 @@ export default function DashboardPage() {
                       <Tooltip content={<CustomTooltip />} />
                       <Legend wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '12px' }} />
                       {allInstitutions.map((inst, i) => (
-                        <Line key={inst} type="monotone" dataKey={inst} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} />
+                        <Line key={inst} type="monotone" dataKey={inst} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
@@ -579,7 +581,7 @@ export default function DashboardPage() {
                       <Tooltip content={<CustomTooltip />} />
                       <Legend wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '12px' }} />
                       {allOwners.map((own, i) => (
-                        <Line key={own} type="monotone" dataKey={own} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} />
+                        <Line key={own} type="monotone" dataKey={own} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
