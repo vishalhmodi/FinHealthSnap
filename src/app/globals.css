@@ -362,3 +362,16 @@ p { line-height: 1.6; color: var(--text-secondary); }
 }
 
 .print-only { display: none; }
+
+/* ─── Hide Number Spinners ───────────────────────────────────────────── */
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
