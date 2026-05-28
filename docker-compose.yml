@@ -13,8 +13,5 @@ services:
       - JWT_SECRET=qtrly-jwt-secret-change-in-production-2025
       - NEXTAUTH_URL=http://localhost:3005
     volumes:
-      - finhealth-db:/app/prisma
+      - ./prisma:/app/prisma
     restart: unless-stopped
-
-volumes:
-  finhealth-db:
