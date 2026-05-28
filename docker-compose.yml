@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  finhealthsnap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finhealthsnap
+    ports:
+      - "3000:3000"
+    volumes:
+      - finhealth-db:/app/prisma
+    restart: unless-stopped
+
+volumes:
+  finhealth-db:
