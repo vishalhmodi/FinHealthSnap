@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, Legend, Cell, ReferenceLine, LineChart, Line, PieChart, Pie,
+  BarChart, Bar, Legend, Cell, ReferenceLine, LineChart, Line, PieChart, Pie, LabelList,
 } from 'recharts';
 import styles from './page.module.css';
 import { formatCurrency, formatCurrencyCompact, getChangePercent } from '@/lib/utils';
@@ -361,8 +361,8 @@ export default function DashboardPage() {
                 <h2 className={styles.chartTitle}>Net Worth Breakdown (Waterfall)</h2>
                 <p className={styles.chartSubtitle}>Composition of your current net worth</p>
                 <div className={styles.chartWrapper}>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={waterfallData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={waterfallData} margin={{ top: 40, right: 16, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
                       <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
@@ -385,6 +385,30 @@ export default function DashboardPage() {
                       />
                       <ReferenceLine y={0} stroke="var(--text-muted)" />
                       <Bar dataKey="range" radius={[2, 2, 0, 0]}>
+                        <LabelList 
+                          dataKey="amount" 
+                          content={(props: any) => {
+                            const { x, y, width, height, value } = props;
+                            if (!value) return null;
+                            const isNegative = value < 0;
+                            const textX = x + width / 2;
+                            const textY = isNegative ? y + height + 6 : y - 6;
+                            return (
+                              <text 
+                                x={textX} 
+                                y={textY} 
+                                fill="var(--text-muted)" 
+                                textAnchor={isNegative ? "end" : "start"} 
+                                fontSize={9}
+                                fontFamily="var(--font-mono)"
+                                pointerEvents="none"
+                                transform={`rotate(-90, ${textX}, ${textY})`}
+                              >
+                                {formatCurrencyCompact(value)}
+                              </text>
+                            );
+                          }}
+                        />
                         {waterfallData.map((entry, index) => (
                           <Cell key={index} fill={entry.fill} fillOpacity={0.85} />
                         ))}
