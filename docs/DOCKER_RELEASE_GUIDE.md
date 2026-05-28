@@ -2,7 +2,7 @@
 
 This guide is for **you** (the developer) to prepare a secure release of your application **without** distributing your source code. 
 
-Instead of giving your friend the full project folder, you will package the application into a single compiled Docker Image `.tar` file, along with a production-ready `docker-compose.yml` file.
+Instead of giving the user the full project folder, you will package the application into a single compiled Docker Image `.tar` file, along with a production-ready `docker-compose.yml` file.
 
 ## Step 1: Build the Production Image
 
@@ -47,11 +47,12 @@ services:
       - NEXTAUTH_URL=http://localhost:3005
     volumes:
       # Option 1: Permanent isolated database inside Docker (Blank Start)
+      # Recommended for new users who don't have existing data.
       - finhealth-db:/app/prisma
       
       # Option 2: Share an existing dev.db file
-      # If your friend already has a dev.db file, they should place it in a 'prisma' folder next to this file,
-      # comment out Option 1 above, uncomment Option 2 below, and remove the volumes section at the bottom.
+      # If the user already has a dev.db file, they should place it in a 'prisma' folder next to this file.
+      # To use Option 2: comment out Option 1 above, uncomment Option 2 below, and DELETE the entire 'volumes:' section at the very bottom of this file.
       # - ./prisma:/app/prisma
     restart: unless-stopped
 
@@ -65,6 +66,6 @@ Your `FinHealthSnap_App` folder should now contain exactly two files:
 1. `finhealthsnap-release.tar`
 2. `docker-compose.yml`
 
-*(Optional: If you want to give your friend your existing data, create a folder named `prisma` in here and paste your `dev.db` inside it, then instruct them to use Option 2 in the compose file).*
+*(Optional: If you want to provide the user with existing data, create a folder named `prisma` in here and paste your `dev.db` inside it, then instruct them to use Option 2 in the compose file).*
 
-Zip this folder and send it to your friend! Provide them with the `SETUP_MAC.md` or `SETUP_WINDOWS.md` guide.
+Zip this folder and send it to the user! Provide them with the `SETUP_MAC.md` or `SETUP_WINDOWS.md` guide.

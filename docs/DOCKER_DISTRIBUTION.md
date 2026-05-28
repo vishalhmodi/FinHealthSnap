@@ -1,15 +1,15 @@
 # Docker Distribution Architecture
 
-Yes, it is entirely possible (and highly recommended!) to package this application into a Docker container. This allows you to distribute the app to friends or family without giving them the source code, and without them needing to install Node.js or run any complex setup commands.
+Yes, it is entirely possible (and highly recommended!) to package this application into a Docker container. This allows you to distribute the app to users without giving them the source code, and without them needing to install Node.js or run any complex setup commands.
 
 ## Architecture: How It Works
 
 When we "Dockerize" this Next.js + SQLite application, we bake the entire web server, the frontend code, and all dependencies into a single, immutable **Docker Image**.
 
-However, because Docker containers are "stateless" (meaning any files created inside them are destroyed when the container stops), we cannot store the SQLite database inside the container itself. If we did, your friend would lose all their financial data every time they restarted their computer!
+However, because Docker containers are "stateless" (meaning any files created inside them are destroyed when the container stops), we cannot store the SQLite database inside the container itself. If we did, the user would lose all their financial data every time they restarted their computer!
 
 **The Solution: Volume Mounting**
-When your friend runs the Docker image, they will map a folder on their physical Mac or Windows machine (e.g., `C:\Users\Friend\FinHealthData`) to the folder inside the container where the database lives (`/app/prisma`). 
+When the user runs the Docker image, they will map a folder on their physical Mac or Windows machine (e.g., `C:\Users\User\FinHealthData`) to the folder inside the container where the database lives (`/app/prisma`). 
 This means the app runs safely inside the container, but the `dev.db` file is saved directly to their hard drive.
 
 ---
@@ -27,16 +27,16 @@ As the developer, you only need to do this once:
 
 ---
 
-## Part 2: How Your Friend Uses It (User Side)
+## Part 2: How The User Uses It (User Side)
 
-Your friend does **not** need the GitHub repository. They only need **Docker Desktop** installed on their Mac or Windows machine. 
+The user does **not** need the GitHub repository. They only need **Docker Desktop** installed on their Mac or Windows machine. 
 
-*(Note: Docker Desktop is 100% free for personal use. Your friend can download it directly from the official website here: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/))*
+*(Note: Docker Desktop is 100% free for personal use. The user can download it directly from the official website here: [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/))*
 
 ### Step 1: Create a Folder for Data
 They create an empty folder on their computer where they want their financial data saved. For example:
-- **Mac:** `/Users/friend/Documents/FinHealthData`
-- **Windows:** `C:\Users\Friend\Documents\FinHealthData`
+- **Mac:** `/Users/username/Documents/FinHealthData`
+- **Windows:** `C:\Users\Username\Documents\FinHealthData`
 
 ### Step 2: Run the Docker Command
 They open their terminal or command prompt and run a single command. This command downloads your app from Docker Hub and starts it, linking their empty folder to the database!
@@ -46,7 +46,7 @@ They open their terminal or command prompt and run a single command. This comman
 docker run -d \
   --name finhealthsnap \
   -p 3000:3000 \
-  -v /Users/friend/Documents/FinHealthData:/app/prisma \
+  -v /Users/username/Documents/FinHealthData:/app/prisma \
   vishalhmodi/finhealthsnap:latest
 ```
 
@@ -55,7 +55,7 @@ docker run -d \
 docker run -d ^
   --name finhealthsnap ^
   -p 3000:3000 ^
-  -v C:\Users\Friend\Documents\FinHealthData:/app/prisma ^
+  -v C:\Users\Username\Documents\FinHealthData:/app/prisma ^
   vishalhmodi/finhealthsnap:latest
 ```
 
