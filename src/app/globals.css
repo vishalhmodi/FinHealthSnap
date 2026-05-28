@@ -368,7 +368,10 @@ p { line-height: 1.6; color: var(--text-secondary); }
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: none !important;
+  appearance: none !important;
   margin: 0 !important;
+  display: none !important;
+  opacity: 0 !important;
 }
 
 /* Firefox & Safari */
