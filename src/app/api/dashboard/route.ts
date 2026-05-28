@@ -96,6 +96,8 @@ export async function GET() {
       quarterId: q.id,
       snapshotDate: q.snapshotDate,
       totalAssets,
+      liquidAssets: accountAssets,
+      nonLiquidAssets: customAssets,
       totalLiabilities,
       netWorth,
       categoryBreakdown: categoryMap,
