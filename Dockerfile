@@ -31,15 +31,16 @@ ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 ENV DATABASE_URL "file:./dev.db"
 
-# Install openssl for Prisma and prisma CLI
+# Install openssl for Prisma
 RUN apk add --no-cache openssl
-RUN npm install -g prisma
 
-# Create a non-root user
+# Install prisma locally so prisma/config module is available
+RUN npm install prisma
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Set up the prisma folder where the database will be mounted
+# Ensure prisma directory is accessible
 RUN mkdir -p /app/prisma
 RUN chown nextjs:nodejs /app/prisma
 
@@ -51,8 +52,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma schema and entrypoint script
+# Copy Prisma schema, config, and entrypoint script
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/schema.prisma ./prisma/
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./
 COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./
 RUN chmod +x ./docker-entrypoint.sh
 
