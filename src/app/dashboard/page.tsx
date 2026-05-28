@@ -340,7 +340,7 @@ export default function DashboardPage() {
                               <div className={styles.tooltipLabel}>{data.name}</div>
                               <div className={styles.tooltipRow}>
                                 <span style={{ color: data.payload.fill }}>Amount</span>
-                                <span className="font-mono">{formatCurrency(data.value)}</span>
+                                <span className="font-mono">{formatCurrency(data.value as number)}</span>
                               </div>
                               <div className={styles.tooltipRow}>
                                 <span style={{ color: data.payload.fill }}>Share</span>
