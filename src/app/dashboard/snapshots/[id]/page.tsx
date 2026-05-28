@@ -268,6 +268,25 @@ export default function SnapshotPage() {
 
   function handlePrint() { window.print(); }
 
+  function handleExportJSON() {
+    if (!quarter) return;
+    const exportData = {
+      label: quarter.label,
+      snapshotDate: quarter.snapshotDate,
+      notes: quarter.notes,
+      balances: quarter.balances.map(b => ({
+        account: `${b.account.category.name} - ${b.account.owner.name} (${b.account.institution.name})`,
+        amount: editing ? (editAmounts[b.accountId] ?? b.amount) : b.amount
+      })),
+      customItems: editing ? editCustom : quarter.customItems
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `${quarter.label}-snapshot.json`);
+    dlAnchorElem.click();
+  }
+
   if (loading) return <div className={styles.loading}><div className={styles.spinner} /></div>;
   if (!quarter) return <div className={styles.page}><p>Snapshot not found.</p></div>;
 
@@ -329,6 +348,9 @@ export default function SnapshotPage() {
               </button>
               <button id="print-btn" className="btn btn-secondary" onClick={handlePrint}>
                 ⎙ Print / PDF
+              </button>
+              <button className="btn btn-secondary" onClick={handleExportJSON}>
+                ⬇ Export JSON
               </button>
             </div>
           )}

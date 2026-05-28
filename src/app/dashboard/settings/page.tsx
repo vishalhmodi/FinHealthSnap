@@ -157,6 +157,19 @@ export default function SettingsPage() {
       </div>
 
       <div className={`glass-card ${styles.section}`}>
+        <h2 className={styles.sectionTitle}>Data & Backups</h2>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+          Since this application runs entirely locally on your machine, you can download a complete backup of your database. This file contains all your quarters, accounts, and settings. To restore, simply replace the `prisma/dev.db` file in your application folder with this backup.
+        </p>
+        <button 
+          className="btn btn-secondary" 
+          onClick={() => window.location.href = '/api/backup'}
+        >
+          ⬇ Download Full Database Backup (.db)
+        </button>
+      </div>
+
+      <div className={`glass-card ${styles.section}`}>
         <h2 className={styles.sectionTitle}>Security</h2>
         <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
           <div>
