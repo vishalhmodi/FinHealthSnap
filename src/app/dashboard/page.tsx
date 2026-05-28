@@ -20,6 +20,7 @@ interface TrendPoint {
   categoryBreakdown: Record<string, number>;
   institutionBreakdown: Record<string, number>;
   ownerBreakdown: Record<string, number>;
+  nonLiquidBreakdown: Record<string, number>;
   items: Array<{ name: string; type: 'ASSET' | 'LIABILITY'; amount: number }>;
 }
 
@@ -158,8 +159,8 @@ export default function DashboardPage() {
   const donutTotal = donutData.reduce((sum, d) => sum + d.value, 0);
 
   // Donut Chart 2: Non-Liquid Assets
-  const donut2Data = latest 
-    ? latest.items.filter(i => i.type === 'ASSET').map(i => ({ name: i.name, value: i.amount }))
+  const donut2Data = latest && latest.nonLiquidBreakdown
+    ? Object.entries(latest.nonLiquidBreakdown).map(([name, value]) => ({ name, value }))
     : [];
   const donut2Total = donut2Data.reduce((sum, d) => sum + d.value, 0);
 

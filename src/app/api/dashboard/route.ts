@@ -40,10 +40,10 @@ export async function GET() {
     const totalLiabilities = customLiabilities;
     const netWorth = totalAssets - totalLiabilities;
 
-    // Breakdowns
     const categoryMap: Record<string, number> = {};
     const institutionMap: Record<string, number> = {};
     const ownerMap: Record<string, number> = {};
+    const nonLiquidMap: Record<string, number> = {};
 
     for (const b of q.balances) {
       const cat = b.account.category.name;
@@ -54,6 +54,12 @@ export async function GET() {
 
       const owner = b.account.owner.name;
       ownerMap[owner] = (ownerMap[owner] ?? 0) + b.amount;
+    }
+
+    for (const c of q.customItems) {
+      if (c.itemType === 'ASSET') {
+        nonLiquidMap[c.name] = (nonLiquidMap[c.name] ?? 0) + c.amount;
+      }
     }
 
     // Detailed Items for Waterfall
@@ -103,6 +109,7 @@ export async function GET() {
       categoryBreakdown: categoryMap,
       institutionBreakdown: institutionMap,
       ownerBreakdown: ownerMap,
+      nonLiquidBreakdown: nonLiquidMap,
       items,
     };
   });
