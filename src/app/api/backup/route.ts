@@ -11,11 +11,14 @@ export async function GET() {
     const dbPath = join(process.cwd(), 'prisma', 'dev.db');
     const fileBuffer = readFileSync(dbPath);
 
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `FinanceSnap-Backup-${dateStr}.db`;
+
     return new NextResponse(fileBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/octet-stream',
-        'Content-Disposition': 'attachment; filename="FinanceSnap-Backup.db"',
+        'Content-Disposition': `attachment; filename="${filename}"`,
       },
     });
   } catch (error) {
