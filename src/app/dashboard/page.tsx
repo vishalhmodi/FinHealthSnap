@@ -361,8 +361,8 @@ export default function DashboardPage() {
                 <h2 className={styles.chartTitle}>Net Worth Breakdown (Waterfall)</h2>
                 <p className={styles.chartSubtitle}>Composition of your current net worth</p>
                 <div className={styles.chartWrapper}>
-                  <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={waterfallData} margin={{ top: 40, right: 16, left: 0, bottom: 40 }}>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={waterfallData} margin={{ top: 40, right: 16, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} />
                       <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
