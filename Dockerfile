@@ -29,6 +29,7 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
+ENV DATABASE_URL "file:./dev.db"
 
 # Install openssl for Prisma and prisma CLI
 RUN apk add --no-cache openssl
