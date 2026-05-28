@@ -253,5 +253,23 @@
 
 @media print {
   .page { gap: 16px; }
-  .chartsGrid, .metricsGrid { page-break-inside: avoid; }
+  
+  .metricsGrid { 
+    grid-template-columns: repeat(4, 1fr) !important; 
+    gap: 12px;
+  }
+  
+  .chartsGrid { 
+    grid-template-columns: repeat(2, 1fr) !important; 
+    gap: 12px;
+  }
+  
+  .chartWrapper {
+    flex-wrap: nowrap !important;
+  }
+
+  .chartsGrid, .metricsGrid, .chartCard, .metricCard { 
+    page-break-inside: avoid; 
+    break-inside: avoid;
+  }
 }
