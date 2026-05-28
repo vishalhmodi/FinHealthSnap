@@ -80,7 +80,7 @@ export async function GET() {
       if (existing) {
         existing.amount += c.amount;
       } else {
-        itemsMap.set(key, { name: c.name, type: c.itemType, amount: c.amount });
+        itemsMap.set(key, { name: c.name, type: c.itemType as 'ASSET' | 'LIABILITY', amount: c.amount });
       }
     }
 

@@ -159,7 +159,7 @@ export default function DashboardPage() {
 
   // Component Waterfall data: Net worth breakdown
   let runningTotal = 0;
-  const waterfallData = latest ? latest.items.map(item => {
+  const waterfallData: Array<{ name: string, amount: number, type: string, range: [number, number], fill: string }> = latest ? latest.items.map(item => {
     const isAsset = item.type === 'ASSET';
     const start = runningTotal;
     const end = isAsset ? runningTotal + item.amount : runningTotal - item.amount;
@@ -334,13 +334,13 @@ export default function DashboardPage() {
                         content={({ active, payload }) => {
                           if (!active || !payload?.length) return null;
                           const data = payload[0];
-                          const percent = donutTotal > 0 ? (data.value / donutTotal) * 100 : 0;
+                          const percent = donutTotal > 0 ? ((data.value as number) / donutTotal) * 100 : 0;
                           return (
                             <div className={styles.chartTooltip}>
                               <div className={styles.tooltipLabel}>{data.name}</div>
                               <div className={styles.tooltipRow}>
                                 <span style={{ color: data.payload.fill }}>Amount</span>
-                                <span className="font-mono">{formatCurrency(data.value)}</span>
+                                <span className="font-mono">{formatCurrency(data.value as number)}</span>
                               </div>
                               <div className={styles.tooltipRow}>
                                 <span style={{ color: data.payload.fill }}>Share</span>
