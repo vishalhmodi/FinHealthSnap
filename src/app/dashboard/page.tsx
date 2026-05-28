@@ -100,6 +100,32 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   );
 };
 
+const renderLabelWithExternal = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, fill }: any) => {
+  if (percent < 0.05) return null;
+
+  // Internal Label (Percentage)
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  // External Label (Value)
+  const outerR = outerRadius + 15;
+  const outerX = cx + outerR * Math.cos(-midAngle * RADIAN);
+  const outerY = cy + outerR * Math.sin(-midAngle * RADIAN);
+  const textAnchor = Math.cos(-midAngle * RADIAN) >= 0 ? 'start' : 'end';
+  
+  return (
+    <g>
+      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+      <text x={outerX} y={outerY} fill={fill || 'var(--text-muted)'} textAnchor={textAnchor} dominantBaseline="central" style={{ fontSize: '0.7rem', fontWeight: 500, pointerEvents: 'none', fontFamily: 'var(--font-mono)' }}>
+        {formatCurrencyCompact(value)}
+      </text>
+    </g>
+  );
+};
+
 const truncateLegend = (value: string) => {
   return value.length > 20 ? value.substring(0, 18) + '...' : value;
 };
@@ -167,6 +193,11 @@ export default function DashboardPage() {
     }
   }
   const donut2Total = donut2Data.reduce((sum, d) => sum + d.value, 0);
+
+  // Calculate Net Non-Liquid Assets
+  const nonLiquidAssetsTotal = latest && latest.nonLiquidBreakdown ? Object.values(latest.nonLiquidBreakdown).reduce((sum, v) => sum + v, 0) : 0;
+  const liabilitiesTotal = latest && latest.liabilityBreakdown ? Object.values(latest.liabilityBreakdown).reduce((sum, v) => sum + v, 0) : 0;
+  const donut2NetTotal = nonLiquidAssetsTotal - liabilitiesTotal;
 
   // Component Waterfall data: Net worth breakdown
   let runningTotal = 0;
@@ -333,13 +364,13 @@ export default function DashboardPage() {
                           data={donutData}
                           cx="50%"
                           cy="45%"
-                          innerRadius={45}
-                          outerRadius={70}
+                          innerRadius={40}
+                          outerRadius={65}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
                           labelLine={false}
-                          label={renderCustomizedLabel}
+                          label={renderLabelWithExternal}
                         >
                           <Label 
                             value={formatCurrencyCompact(donutTotal)} 
@@ -395,7 +426,7 @@ export default function DashboardPage() {
                           label={renderCustomizedLabel}
                         >
                           <Label 
-                            value={formatCurrencyCompact(donut2Total)} 
+                            value={formatCurrencyCompact(donut2NetTotal)} 
                             position="center" 
                             fill="var(--text)" 
                             style={{ fontSize: '1rem', fontWeight: 'bold' }} 
