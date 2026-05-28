@@ -57,25 +57,34 @@ export async function GET() {
     }
 
     // Detailed Items for Waterfall
-    const items: Array<{ name: string; type: 'ASSET' | 'LIABILITY'; amount: number }> = [];
+    const itemsMap = new Map<string, { name: string; type: 'ASSET' | 'LIABILITY'; amount: number }>();
 
     for (const b of q.balances) {
       if (b.amount === 0) continue;
-      items.push({
-        name: `${b.account.category.name} - ${b.account.owner.name}`,
-        type: 'ASSET',
-        amount: b.amount,
-      });
+      const name = `${b.account.category.name} - ${b.account.owner.name}`;
+      const key = `${name}::ASSET`;
+      
+      const existing = itemsMap.get(key);
+      if (existing) {
+        existing.amount += b.amount;
+      } else {
+        itemsMap.set(key, { name, type: 'ASSET', amount: b.amount });
+      }
     }
 
     for (const c of q.customItems) {
       if (c.amount === 0) continue;
-      items.push({
-        name: c.name,
-        type: c.itemType,
-        amount: c.amount,
-      });
+      const key = `${c.name}::${c.itemType}`;
+      
+      const existing = itemsMap.get(key);
+      if (existing) {
+        existing.amount += c.amount;
+      } else {
+        itemsMap.set(key, { name: c.name, type: c.itemType, amount: c.amount });
+      }
     }
+
+    const items = Array.from(itemsMap.values());
 
     items.sort((a, b) => {
       if (a.type !== b.type) return a.type === 'ASSET' ? -1 : 1;
