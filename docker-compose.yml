@@ -9,6 +9,9 @@ services:
       - "3005:3000"
     environment:
       - DATABASE_URL=file:/app/prisma/dev.db
+      - NEXTAUTH_SECRET=qtrly-snapshot-secret-change-in-production-2025
+      - JWT_SECRET=qtrly-jwt-secret-change-in-production-2025
+      - NEXTAUTH_URL=http://localhost:3005
     volumes:
       - finhealth-db:/app/prisma
     restart: unless-stopped
