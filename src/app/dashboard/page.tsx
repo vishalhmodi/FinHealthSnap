@@ -92,23 +92,16 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  // External Label (Value)
-  const outerR = outerRadius + 20;
-  const outerX = cx + outerR * Math.cos(-midAngle * RADIAN);
-  const outerY = cy + outerR * Math.sin(-midAngle * RADIAN);
-  const textAnchor = Math.cos(-midAngle * RADIAN) >= 0 ? 'start' : 'end';
   
   return (
-    <g>
-      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-      <text x={outerX} y={outerY} fill={fill || 'var(--text-muted)'} textAnchor={textAnchor} dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 500, pointerEvents: 'none', fontFamily: 'var(--font-mono)' }}>
-        {formatCurrencyCompact(value)}
-      </text>
-    </g>
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" style={{ fontSize: '0.75rem', fontWeight: 600, pointerEvents: 'none' }}>
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
   );
+};
+
+const truncateLegend = (value: string) => {
+  return value.length > 20 ? value.substring(0, 18) + '...' : value;
 };
 
 export default function DashboardPage() {
@@ -334,14 +327,14 @@ export default function DashboardPage() {
                   {/* Donut 1: Liquid Assets */}
                   <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
                     <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Liquid Assets</h3>
-                    <ResponsiveContainer width="100%" height={260}>
-                      <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
                         <Pie
                           data={donutData}
                           cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={75}
+                          cy="45%"
+                          innerRadius={45}
+                          outerRadius={70}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
@@ -353,6 +346,7 @@ export default function DashboardPage() {
                             position="center" 
                             fill="var(--text)" 
                             style={{ fontSize: '1rem', fontWeight: 'bold' }} 
+                            dy={-5}
                           />
                           {donutData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="var(--bg-card)" />
@@ -378,7 +372,7 @@ export default function DashboardPage() {
                             );
                           }} 
                         />
-                        <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingTop: '12px' }} />
+                        <Legend formatter={truncateLegend} wrapperStyle={{ fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '10px' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -386,14 +380,14 @@ export default function DashboardPage() {
                   {/* Donut 2: Non-Liquid Assets & Liabilities */}
                   <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
                     <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets & Liabilities</h3>
-                    <ResponsiveContainer width="100%" height={260}>
-                      <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                    <ResponsiveContainer width="100%" height={280}>
+                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
                         <Pie
                           data={donut2Data}
                           cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={75}
+                          cy="45%"
+                          innerRadius={45}
+                          outerRadius={70}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
@@ -405,6 +399,7 @@ export default function DashboardPage() {
                             position="center" 
                             fill="var(--text)" 
                             style={{ fontSize: '1rem', fontWeight: 'bold' }} 
+                            dy={-5}
                           />
                           {donut2Data.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={CHART_COLORS[(index + 4) % CHART_COLORS.length]} stroke="var(--bg-card)" />
@@ -430,7 +425,7 @@ export default function DashboardPage() {
                             );
                           }} 
                         />
-                        <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingTop: '12px' }} />
+                        <Legend formatter={truncateLegend} wrapperStyle={{ fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '10px' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
