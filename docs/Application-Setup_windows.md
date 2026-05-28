@@ -52,3 +52,13 @@ docker compose up -d
 3. If you chose Option B, log in with your existing credentials.
 
 **To stop the app:** Run `docker compose down` in your PowerShell window.
+
+## How to Restart the App Later
+If you have stopped the app or restarted your computer, follow these steps to bring it back up:
+1. Open **PowerShell** and ensure Docker Desktop is running.
+2. Type `cd ` (with a space at the end) and drag the `FinHealthSnap_App` folder into the PowerShell window, then press Enter.
+3. Run the following command:
+   ```cmd
+   docker compose up -d
+   ```
+4. Access the app at **[http://localhost:3005](http://localhost:3005)**
