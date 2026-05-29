@@ -35,17 +35,21 @@ Now that you are inside the folder, tell Node.js to install the required backgro
 2. Press **Enter** and wait a minute for it to finish.
 
 ## Step 6: Set up the Environment & Database
-The application needs a database and some default settings to run. Run these three commands one after the other in the Command Prompt (pressing **Enter** after each):
+The application needs a database and some default settings to run. Run these commands one after the other in the Command Prompt (pressing **Enter** after each):
 
 1. **Copy the default settings:**
    ```cmd
    copy .env.example .env
    ```
-2. **Create the local database:**
+2. **Generate the database client:**
+   ```cmd
+   npx prisma generate
+   ```
+3. **Create the local database:**
    ```cmd
    npx prisma db push
    ```
-3. **Seed the database with a starter account:**
+4. **Seed the database with a starter account:**
    ```cmd
    npm run seed
    ```
