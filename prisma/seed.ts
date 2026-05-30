@@ -13,15 +13,14 @@ const adapter = new PrismaLibSql({ url: `file:${dbPath}` });
 const prisma = new PrismaClient({ adapter } as any);
 
 async function main() {
-  console.log('Clearing existing data...');
-  await prisma.accountBalance.deleteMany();
-  await prisma.customAssetLiability.deleteMany();
-  await prisma.quarter.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.accountCategory.deleteMany();
-  await prisma.institution.deleteMany();
-  await prisma.owner.deleteMany();
-  await prisma.user.deleteMany();
+  console.log('Clearing existing seed users (leaving real user data intact)...');
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: ['user@example.com', 'demo@snapshot.local', 'demoCA@snapshot.local']
+      }
+    }
+  });
 
   // Create User
   const passwordHash = await bcrypt.hash('password123', 10);
