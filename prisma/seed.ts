@@ -17,7 +17,7 @@ async function main() {
   await prisma.user.deleteMany({
     where: {
       email: {
-        in: ['user@example.com', 'demo@snapshot.local', 'demoCA@snapshot.local']
+        in: ['user@example.com', 'demoUSA@snapshot.local', 'demoCA@snapshot.local']
       }
     }
   });
@@ -126,9 +126,9 @@ async function main() {
   );
 
   // Create Demo User (US)
-  const demoPasswordHash = await bcrypt.hash('DemoPassword123', 10);
+  const demoPasswordHash = await bcrypt.hash('DemoUSAPassword123', 10);
   await createUserWithData(
-    'demo@snapshot.local',
+    'demoUSA@snapshot.local',
     'Demo User',
     demoPasswordHash,
     rowData.slice(-4) // Just the last 4 quarters for the demo account
@@ -156,7 +156,7 @@ async function createUserWithData(email: string, name: string, passwordHash: str
   });
   const userId = user.id;
 
-  const isDemoUS = email === 'demo@snapshot.local';
+  const isDemoUS = email === 'demoUSA@snapshot.local';
   const isDemoCA = email === 'demoCA@snapshot.local';
   const isDemo = isDemoUS || isDemoCA;
 
