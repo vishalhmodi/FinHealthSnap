@@ -234,6 +234,7 @@ async function createUserWithData(email: string, name: string, passwordHash: str
 
     for (let i = 0; i < row.values.length; i++) {
       let amount = row.values[i];
+      if (email === 'user@example.com') amount = Math.round(amount / 0.70);
       if (isDemoUS) amount = amount * 0.85; 
       if (isDemoCA) amount = amount * 0.50; // Cut exactly in half per request
       
@@ -251,6 +252,7 @@ async function createUserWithData(email: string, name: string, passwordHash: str
     if (row.custom) {
       for (const c of row.custom) {
         let cAmount = c.amount;
+        if (email === 'user@example.com') cAmount = Math.round(cAmount / 0.70);
         if (isDemoUS) cAmount = cAmount * 0.85;
         if (isDemoCA) cAmount = cAmount * 0.50; // 1M * 0.50 = 500K
         
