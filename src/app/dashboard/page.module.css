@@ -477,9 +477,11 @@
     flex-wrap: nowrap !important;
   }
 
-  .chartsGrid, .metricsGrid, .chartCard, .metricCard { 
+  .chartCard, .metricCard { 
     page-break-inside: avoid; 
     break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    display: block !important;
   }
 
   .quarterRow {
