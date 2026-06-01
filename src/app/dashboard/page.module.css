@@ -464,7 +464,7 @@
   .page { gap: 16px; }
   
   .metricsGrid { 
-    grid-template-columns: repeat(4, 1fr) !important; 
+    grid-template-columns: repeat(5, 1fr) !important; 
     gap: 12px;
   }
   
