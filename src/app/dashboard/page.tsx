@@ -35,36 +35,58 @@ interface DashboardData {
   latest: TrendPoint | null;
 }
 
-function MetricCard({ title, amount, subtitle, type, delta }: {
-  title: string; amount: number; subtitle?: string;
-  type: 'asset' | 'liability' | 'networth'; delta?: number;
+function MetricCard({ title, amount, type, deltaAmount, deltaPercent, deltaLabel, subItems, isDerived }: {
+  title: string; amount: number; 
+  type: 'asset' | 'liability' | 'networth' | 'change' | 'ytd';
+  deltaAmount?: number; deltaPercent?: number; deltaLabel?: string;
+  subItems?: React.ReactNode;
+  isDerived?: boolean;
 }) {
   const colorMap = {
-    asset: 'var(--color-asset)',
-    liability: 'var(--color-liability)',
-    networth: 'var(--color-networth)',
+    asset: '#3b82f6', // blue
+    liability: '#ef4444', // red
+    networth: '#10b981', // green
+    change: '#8b5cf6', // purple
+    ytd: '#f59e0b', // orange
   };
   const bgMap = {
-    asset: 'var(--color-asset-light)',
-    liability: 'var(--color-liability-light)',
-    networth: 'var(--color-networth-light)',
+    asset: 'rgba(59, 130, 246, 0.1)',
+    liability: 'rgba(239, 68, 68, 0.1)',
+    networth: 'rgba(16, 185, 129, 0.1)',
+    change: 'rgba(139, 92, 246, 0.1)',
+    ytd: 'rgba(245, 158, 11, 0.1)',
   };
+
+  const isPositive = deltaAmount !== undefined ? deltaAmount >= 0 : deltaPercent !== undefined ? deltaPercent >= 0 : true;
+  const deltaColor = type === 'liability' ? (isPositive ? '#ef4444' : '#10b981') : (isPositive ? '#10b981' : '#ef4444');
 
   return (
     <div className={`glass-card ${styles.metricCard}`} style={{ '--accent': colorMap[type] } as React.CSSProperties}>
-      <div className={styles.metricLabel}>{title}</div>
-      <div className={styles.metricAmount} style={{ color: colorMap[type] }}>
-        {formatCurrency(amount)}
-      </div>
-      {subtitle && <div className={styles.metricSub}>{subtitle}</div>}
-      {delta !== undefined && (
-        <div className={styles.metricDelta} style={{
-          color: delta >= 0 ? 'var(--color-asset)' : 'var(--color-liability)',
-          background: delta >= 0 ? 'var(--color-asset-light)' : 'var(--color-liability-light)',
-        }}>
-          {delta >= 0 ? '↑' : '↓'} {Math.abs(delta).toFixed(1)}% vs prev quarter
+      <div className={styles.metricContent}>
+        <div className={styles.metricLabel}>{title}</div>
+        <div className={styles.metricAmount} style={{ color: colorMap[type] }}>
+          {formatCurrency(amount)}
         </div>
-      )}
+        {isDerived && (
+          <div className={styles.derivedIcon} style={{ background: bgMap[type], color: colorMap[type] }}>
+            {type === 'change' ? (
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+            ) : (
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>
+            )}
+          </div>
+        )}
+        {subItems && <div className={styles.metricSub}>{subItems}</div>}
+        {deltaLabel && (deltaAmount !== undefined || deltaPercent !== undefined) && (
+          <div className={styles.metricDelta}>
+            <strong style={{ color: deltaColor }}>
+              {isPositive ? '↑' : '↓'} {deltaAmount !== undefined ? `${formatCurrency(Math.abs(deltaAmount))} ` : ''}
+              {deltaPercent !== undefined ? `(${Math.abs(deltaPercent).toFixed(2)}%)` : ''}
+            </strong>
+            <span className={styles.vsText}>{`vs ${deltaLabel}`}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -127,7 +149,7 @@ const renderLabelWithExternal = ({ cx, cy, midAngle, innerRadius, outerRadius, p
 };
 
 const truncateLegend = (value: string) => {
-  return value.length > 20 ? value.substring(0, 18) + '...' : value;
+  return value.length > 30 ? value.substring(0, 28) + '...' : value;
 };
 
 export default function DashboardPage() {
@@ -135,6 +157,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [horizon, setHorizon] = useState<string>('ALL');
   const [selectedQuarterId, setSelectedQuarterId] = useState<string | null>(null);
+  const [showAssets, setShowAssets] = useState(true);
+  const [showLiabilities, setShowLiabilities] = useState(true);
+  const [showNetWorth, setShowNetWorth] = useState(true);
 
   useEffect(() => {
     fetch('/api/dashboard')
@@ -163,14 +188,37 @@ export default function DashboardPage() {
 
   const upToLatestTrends = latestIndex >= 0 ? trends.slice(0, latestIndex + 1) : [];
 
-  const filteredTrends = horizon === 'ALL' 
-    ? upToLatestTrends 
-    : upToLatestTrends.slice(-parseInt(horizon, 10));
+  const filteredTrends = (() => {
+    if (horizon === 'ALL') return upToLatestTrends;
+    if (horizon === 'YTD' && latest) {
+      const currentYearMatch = latest.label.match(/\d{4}/);
+      const currentYear = currentYearMatch ? currentYearMatch[0] : '';
+      return upToLatestTrends.filter(t => t.label.includes(currentYear));
+    }
+    return upToLatestTrends.slice(-parseInt(horizon, 10));
+  })();
+  const liquidAssetDeltaAmount = prev && latest ? latest.liquidAssets - prev.liquidAssets : undefined;
+  const nonLiquidAssetDeltaAmount = prev && latest ? latest.nonLiquidAssets - prev.nonLiquidAssets : undefined;
+  const totalAssetDeltaAmount = prev && latest ? latest.totalAssets - prev.totalAssets : undefined;
+  const totalAssetDeltaPercent = prev && latest ? getChangePercent(latest.totalAssets, prev.totalAssets) : undefined;
+  const netWorthDeltaAmount = prev && latest ? latest.netWorth - prev.netWorth : undefined;
 
+  let ytdBaseQuarter = null;
+  let ytdDeltaAmount = undefined;
+  let ytdDeltaPercent = undefined;
+  if (latest && upToLatestTrends.length > 0) {
+    const currentYearMatch = latest.label.match(/\d{4}/);
+    const currentYear = currentYearMatch ? parseInt(currentYearMatch[0], 10) : new Date().getFullYear();
+    const prevYearLabel = (currentYear - 1).toString();
+    const ytdBases = upToLatestTrends.filter(t => t.label.includes(prevYearLabel));
+    ytdBaseQuarter = ytdBases.length > 0 ? ytdBases[ytdBases.length - 1] : upToLatestTrends[0];
+    
+    ytdDeltaAmount = latest.netWorth - ytdBaseQuarter.netWorth;
+    ytdDeltaPercent = ytdBaseQuarter.netWorth !== 0 ? (ytdDeltaAmount / Math.abs(ytdBaseQuarter.netWorth)) * 100 : 0;
+  }
   const netWorthDelta = prev && latest ? getChangePercent(latest.netWorth, prev.netWorth) : undefined;
-  const liquidAssetDelta = prev && latest ? getChangePercent(latest.liquidAssets, prev.liquidAssets) : undefined;
-  const nonLiquidAssetDelta = prev && latest ? getChangePercent(latest.nonLiquidAssets, prev.nonLiquidAssets) : undefined;
   const liabilityDelta = prev && latest ? getChangePercent(latest.totalLiabilities, prev.totalLiabilities) : undefined;
+  const liabilityDeltaAmount = prev && latest ? latest.totalLiabilities - prev.totalLiabilities : undefined;
 
   // Donut Chart: Asset categories
   const donutData = latest 
@@ -278,53 +326,113 @@ export default function DashboardPage() {
         <>
           <div className={styles.metricsGrid}>
             <MetricCard
-              title="Liquid Assets"
-              amount={latest.liquidAssets}
-              subtitle="Investments & Cash"
-              type="asset"
-              delta={liquidAssetDelta}
+              title="Net Worth"
+              amount={latest.netWorth}
+              type="networth"
+              deltaAmount={netWorthDeltaAmount}
+              deltaPercent={netWorthDelta}
+              deltaLabel={prev?.label}
             />
             <MetricCard
-              title="Non-Liquid Assets"
-              amount={latest.nonLiquidAssets}
-              subtitle="Real Estate Equity"
+              title="Total Assets"
+              amount={latest.totalAssets}
               type="asset"
-              delta={nonLiquidAssetDelta}
+              deltaAmount={totalAssetDeltaAmount}
+              deltaPercent={totalAssetDeltaPercent}
+              deltaLabel={prev?.label}
+              subItems={
+                <div className={styles.assetBreakdown}>
+                  <div className={styles.assetBar}>
+                    <div className={styles.liquidBar} style={{ width: `${(latest.liquidAssets / latest.totalAssets) * 100}%` }} />
+                    <div className={styles.nonLiquidBar} style={{ width: `${(latest.nonLiquidAssets / latest.totalAssets) * 100}%` }} />
+                  </div>
+                  <div className={styles.assetLegend}>
+                    <div className={styles.assetLegendItem}>
+                      <div className={styles.assetLegendLabel}>
+                        <span className={styles.liquidDot}></span>
+                        <span title="Liquid" style={{ fontSize: '0.85rem' }}>💧</span>
+                      </div>
+                      <span className={styles.assetValue}>{formatCurrencyCompact(latest.liquidAssets)}</span>
+                    </div>
+                    <div className={styles.assetLegendItem}>
+                      <div className={styles.assetLegendLabel}>
+                        <span className={styles.nonLiquidDot}></span>
+                        <span title="Non-Liquid" style={{ fontSize: '0.85rem' }}>🧊</span>
+                      </div>
+                      <span className={styles.assetValue}>{formatCurrencyCompact(latest.nonLiquidAssets)}</span>
+                    </div>
+                  </div>
+                </div>
+              }
             />
             <MetricCard
               title="Total Liabilities"
               amount={latest.totalLiabilities}
-              subtitle="Mortgages + HELOCs"
               type="liability"
-              delta={liabilityDelta !== undefined ? -liabilityDelta : undefined}
+              deltaAmount={liabilityDeltaAmount}
+              deltaPercent={liabilityDelta}
+              deltaLabel={prev?.label}
             />
             <MetricCard
-              title="Net Worth"
-              amount={latest.netWorth}
-              subtitle="Assets − Liabilities"
-              type="networth"
-              delta={netWorthDelta}
+              title="Change This Quarter"
+              amount={netWorthDeltaAmount || 0}
+              type="change"
+              deltaPercent={netWorthDelta}
+              deltaLabel={prev?.label}
+              isDerived
+            />
+            <MetricCard
+              title="YTD Change"
+              amount={ytdDeltaAmount || 0}
+              type="ytd"
+              deltaPercent={ytdDeltaPercent}
+              deltaLabel={ytdBaseQuarter?.label}
+              isDerived
             />
           </div>
 
           {/* Charts Row */}
           {trends.length > 0 && (
             <>
-              <div className={styles.horizonSelector}>
-                <button className={`btn btn-sm ${horizon === '2' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('2')}>Last 2 Qtrs</button>
-                <button className={`btn btn-sm ${horizon === '4' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('4')}>Last 4 Qtrs</button>
-                <button className={`btn btn-sm ${horizon === '6' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('6')}>Last 6 Qtrs</button>
-                <button className={`btn btn-sm ${horizon === '8' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('8')}>Last 8 Qtrs</button>
-                <button className={`btn btn-sm ${horizon === 'ALL' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('ALL')}>All Time</button>
-              </div>
-
               <div className={styles.chartsGrid}>
               {/* Area Chart: Assets vs Liabilities vs Net Worth */}
-              <div className={`glass-card ${styles.chartCard}`}>
-                <h2 className={styles.chartTitle}>Net Worth Trend</h2>
-                <p className={styles.chartSubtitle}>Assets, liabilities, and net worth over time</p>
+              <div className={`glass-card ${styles.chartCard} ${styles.fullWidthChart}`}>
+                <div className={styles.chartHeaderRow}>
+                  <div className={styles.chartTitleWrapper}>
+                    <h2 className={styles.chartTitle}>Assets, Liabilities & Net Worth Over Time</h2>
+                    <div className={styles.compactLegend}>
+                      <button 
+                        onClick={() => setShowAssets(!showAssets)}
+                        className={`${styles.legendItem} ${showAssets ? styles.active : ''}`}
+                      >
+                        <span className={styles.legendDot} style={{backgroundColor: '#10b981'}}></span> Assets
+                      </button>
+                      <button 
+                        onClick={() => setShowLiabilities(!showLiabilities)}
+                        className={`${styles.legendItem} ${showLiabilities ? styles.active : ''}`}
+                      >
+                        <span className={styles.legendDot} style={{backgroundColor: '#ef4444'}}></span> Liabilities
+                      </button>
+                      <button 
+                        onClick={() => setShowNetWorth(!showNetWorth)}
+                        className={`${styles.legendItem} ${showNetWorth ? styles.active : ''}`}
+                      >
+                        <span className={styles.legendDot} style={{backgroundColor: '#3b82f6'}}></span> Net Worth
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.horizonInline}>
+                    <button className={`btn btn-sm ${horizon === 'YTD' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('YTD')}>YTD</button>
+                    <button className={`btn btn-sm ${horizon === '2' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('2')}>2Qtrs</button>
+                    <button className={`btn btn-sm ${horizon === '4' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('4')}>4Qtrs</button>
+                    <button className={`btn btn-sm ${horizon === '8' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('8')}>8Qtrs</button>
+                    <button className={`btn btn-sm ${horizon === '12' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('12')}>12Qtrs</button>
+                    <button className={`btn btn-sm ${horizon === '20' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('20')}>20Qtrs</button>
+                    <button className={`btn btn-sm ${horizon === 'ALL' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHorizon('ALL')}>All</button>
+                  </div>
+                </div>
                 <div className={styles.chartWrapper}>
-                  <ResponsiveContainer width="100%" height={260}>
+                  <ResponsiveContainer width="100%" height={320}>
                     <AreaChart data={chartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                       <defs>
                         <linearGradient id="gradAsset" x1="0" y1="0" x2="0" y2="1">
@@ -332,41 +440,44 @@ export default function DashboardPage() {
                           <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
                         </linearGradient>
                         <linearGradient id="gradNetWorth" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0.02} />
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.02} />
+                        </linearGradient>
+                        <linearGradient id="gradLiability" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
                         </linearGradient>
                       </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="label" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                       <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: '0.8rem', color: 'var(--text-muted)', paddingTop: '12px' }} />
-                      <Area type="monotone" dataKey="Total Assets" stroke="#10b981" strokeWidth={2} fill="url(#gradAsset)" isAnimationActive={false} />
-                      <Area type="monotone" dataKey="Net Worth" stroke="#6366f1" strokeWidth={2.5} fill="url(#gradNetWorth)" isAnimationActive={false} />
-                      <Area type="monotone" dataKey="Total Liabilities" stroke="#ef4444" strokeWidth={2} fill="none" strokeDasharray="5 3" isAnimationActive={false} />
+                      {showAssets && <Area type="monotone" dataKey="Total Assets" stroke="#10b981" strokeWidth={2.5} fill="url(#gradAsset)" dot={{ r: 4, fill: 'var(--bg-card)', stroke: '#10b981', strokeWidth: 2 }} activeDot={{ r: 6 }} isAnimationActive={false} />}
+                      {showNetWorth && <Area type="monotone" dataKey="Net Worth" stroke="#3b82f6" strokeWidth={2.5} fill="url(#gradNetWorth)" dot={{ r: 4, fill: 'var(--bg-card)', stroke: '#3b82f6', strokeWidth: 2 }} activeDot={{ r: 6 }} isAnimationActive={false} />}
+                      {showLiabilities && <Area type="monotone" dataKey="Total Liabilities" stroke="#ef4444" strokeWidth={2.5} fill="url(#gradLiability)" dot={{ r: 4, fill: 'var(--bg-card)', stroke: '#ef4444', strokeWidth: 2 }} activeDot={{ r: 6 }} isAnimationActive={false} />}
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
               {/* Donut Charts: Asset Allocation & Distribution */}
-              <div className={`glass-card ${styles.chartCard}`}>
+              <div className={`glass-card ${styles.chartCard} ${styles.fullWidthChart}`}>
                 <h2 className={styles.chartTitle}>Asset Allocation</h2>
                 <p className={styles.chartSubtitle}>Liquid vs Non-Liquid Asset and Liability breakdown</p>
                 <div className={styles.chartWrapper} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
                   
                   {/* Donut 1: Liquid Assets */}
-                  <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
-                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Liquid Assets</h3>
-                    <ResponsiveContainer width="100%" height={280}>
-                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                  <div style={{ flex: '1 1 45%', minWidth: '300px' }}>
+                    <h3 style={{ textAlign: 'center', fontSize: '1rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Liquid Assets</h3>
+                    <ResponsiveContainer width="100%" height={340}>
+                      <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                         <Pie
                           data={donutData}
                           isAnimationActive={false}
                           cx="50%"
-                          cy="45%"
-                          innerRadius={40}
-                          outerRadius={65}
+                          cy="50%"
+                          innerRadius={85}
+                          outerRadius={130}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
@@ -376,8 +487,8 @@ export default function DashboardPage() {
                           <Label 
                             value={formatCurrencyCompact(donutTotal)} 
                             position="center" 
-                            fill="var(--text)" 
-                            style={{ fontSize: '1rem', fontWeight: 'bold' }} 
+                            fill="var(--text-primary)" 
+                            style={{ fontSize: '1.2rem', fontWeight: 'bold' }} 
                             dy={-5}
                           />
                           {donutData.map((entry, index) => (
@@ -404,34 +515,34 @@ export default function DashboardPage() {
                             );
                           }} 
                         />
-                        <Legend formatter={truncateLegend} wrapperStyle={{ fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '10px' }} />
+                        <Legend layout="vertical" verticalAlign="middle" align="right" formatter={truncateLegend} wrapperStyle={{ fontSize: '0.9rem', color: 'var(--text-muted)' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
 
                   {/* Donut 2: Non-Liquid Assets & Liabilities */}
-                  <div style={{ flex: '1 1 45%', minWidth: '150px' }}>
-                    <h3 style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets & Liabilities</h3>
-                    <ResponsiveContainer width="100%" height={280}>
-                      <PieChart margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
+                  <div style={{ flex: '1 1 45%', minWidth: '300px' }}>
+                    <h3 style={{ textAlign: 'center', fontSize: '1rem', color: 'var(--text-muted)', marginBottom: '0.5rem', fontWeight: 500 }}>Non-Liquid Assets & Liabilities</h3>
+                    <ResponsiveContainer width="100%" height={340}>
+                      <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                         <Pie
                           data={donut2Data}
                           isAnimationActive={false}
                           cx="50%"
-                          cy="45%"
-                          innerRadius={45}
-                          outerRadius={70}
+                          cy="50%"
+                          innerRadius={85}
+                          outerRadius={130}
                           paddingAngle={2}
                           dataKey="value"
                           nameKey="name"
                           labelLine={false}
-                          label={renderCustomizedLabel}
+                          label={renderLabelWithExternal}
                         >
                           <Label 
                             value={formatCurrencyCompact(donut2NetTotal)} 
                             position="center" 
-                            fill="var(--text)" 
-                            style={{ fontSize: '1rem', fontWeight: 'bold' }} 
+                            fill="var(--text-primary)" 
+                            style={{ fontSize: '1.2rem', fontWeight: 'bold' }} 
                             dy={-5}
                           />
                           {donut2Data.map((entry, index) => (
@@ -458,7 +569,7 @@ export default function DashboardPage() {
                             );
                           }} 
                         />
-                        <Legend formatter={truncateLegend} wrapperStyle={{ fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '10px' }} />
+                        <Legend layout="vertical" verticalAlign="middle" align="right" formatter={truncateLegend} wrapperStyle={{ fontSize: '0.9rem', color: 'var(--text-muted)' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>

@@ -25,14 +25,16 @@
 /* ─── Metrics ────────────────────────────────────────────────────────── */
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
 }
 
 .metricCard {
-  padding: 24px;
+  padding: 20px 16px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .metricCard::before {
@@ -46,17 +48,24 @@
   opacity: 0.7;
 }
 
+.metricContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
 .metricLabel {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .metricAmount {
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
   font-weight: 700;
   font-family: var(--font-mono);
   letter-spacing: -0.02em;
@@ -64,20 +73,119 @@
   line-height: 1.1;
 }
 
-.metricSub {
-  font-size: 0.75rem;
+.metricDelta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 500;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-top: auto;
+  width: 100%;
 }
 
-.metricDelta {
-  display: inline-flex;
+.metricDelta span.vsText {
+  white-space: nowrap;
+  text-align: right;
+  opacity: 0.8;
+}
+
+.derivedIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+.derivedIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.assetBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.assetBar {
+  display: flex;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--glass-border);
+  width: 100%;
+}
+
+.liquidBar {
+  background: #3b82f6;
+}
+
+.nonLiquidBar {
+  background: #f59e0b;
+}
+
+.assetLegend {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.assetLegendItem {
+  display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.75rem;
+}
+
+.assetLegendLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.liquidDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b82f6;
+}
+
+.nonLiquidDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  flex-shrink: 0;
+}
+
+.assetValue {
+  color: var(--text-color);
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 99px;
+  font-family: var(--font-mono);
+}
+
+.metricDelta strong {
+  font-weight: 600;
+}
+
+.metricSub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 /* ─── Charts ─────────────────────────────────────────────────────────── */
@@ -85,6 +193,100 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 20px;
+}
+
+.fullWidthChart {
+  grid-column: 1 / -1;
+}
+
+.chartHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.chartTitleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.chartTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.compactLegend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+.legendItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.legendItem.active {
+  color: var(--text-color);
+}
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+.legendItem.active .legendDot {
+  opacity: 1;
+}
+
+.chartToggles {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chartToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--transition);
+  background: transparent;
+}
+
+.toggleColorBox {
+  width: 16px;
+  height: 6px;
+  border-radius: 3px;
 }
 
 .horizonSelector {
@@ -101,6 +303,13 @@
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
+}
+
+.horizonInline {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .chartCard {
