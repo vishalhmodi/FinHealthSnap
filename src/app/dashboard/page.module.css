@@ -469,8 +469,9 @@
   }
   
   .chartsGrid { 
-    grid-template-columns: repeat(2, 1fr) !important; 
-    gap: 12px;
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
   }
   
   .chartWrapper {
@@ -478,11 +479,18 @@
   }
 
   .chartCard, .metricCard { 
-    page-break-inside: avoid; 
-    break-inside: avoid;
-    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid !important; 
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
     display: inline-block !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  
+  .chartCard * {
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   .quarterRow {
