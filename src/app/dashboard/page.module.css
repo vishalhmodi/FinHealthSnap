@@ -464,21 +464,45 @@
   .page { gap: 16px; }
   
   .metricsGrid { 
-    grid-template-columns: repeat(4, 1fr) !important; 
+    grid-template-columns: repeat(5, 1fr) !important; 
     gap: 12px;
   }
   
   .chartsGrid { 
-    grid-template-columns: repeat(2, 1fr) !important; 
-    gap: 12px;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 16px;
   }
   
   .chartWrapper {
     flex-wrap: nowrap !important;
   }
 
-  .chartsGrid, .metricsGrid, .chartCard, .metricCard { 
-    page-break-inside: avoid; 
+  .chartCard, .metricCard { 
+    page-break-inside: avoid !important; 
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    display: inline-block !important;
+    width: calc(50% - 8px) !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    vertical-align: top !important;
+  }
+  
+  .fullWidthChart {
+    width: 100% !important;
+  }
+  
+  /* Safari Recharts hack to prevent absolute position tear-offs during print */
+  .recharts-responsive-container,
+  .recharts-responsive-container > div,
+  .recharts-wrapper {
+    position: relative !important;
+  }
+  
+  .chartCard * {
+    page-break-inside: avoid;
     break-inside: avoid;
   }
 
