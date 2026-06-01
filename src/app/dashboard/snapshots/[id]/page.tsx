@@ -201,17 +201,20 @@ export default function SnapshotPage() {
   }
 
   function addCustomItem() {
-    setEditCustom((prev) => [
-      ...prev,
-      {
-        id: '',
-        name: '',
-        detail: '',
-        itemType: 'ASSET',
-        amount: 0,
-        sortOrder: prev.length,
-      },
-    ]);
+    setEditCustom((prev) => {
+      const minSortOrder = prev.length > 0 ? Math.min(...prev.map(p => p.sortOrder)) : 0;
+      return [
+        {
+          id: '',
+          name: '',
+          detail: '',
+          itemType: 'ASSET',
+          amount: 0,
+          sortOrder: minSortOrder - 1,
+        },
+        ...prev,
+      ];
+    });
   }
 
   function removeCustomItem(idx: number) {
