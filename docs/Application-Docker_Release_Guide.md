@@ -9,9 +9,9 @@ Instead of giving the user the full project folder, you will package the applica
 Open your terminal in your project root (`/Users/vicky/Projects/FinHealthSnap`) and build the final Docker image.
 
 ```bash
-docker build -t finhealthsnap-release:latest .
+docker buildx build --platform linux/amd64 -t finhealthsnap-release:latest --load .
 ```
-*(This uses the `Dockerfile` to compile the app and securely bundle it into an image).*
+*(This uses Docker Buildx to specifically build an AMD64 image, which runs natively on Windows and flawlessly on Macs via Rosetta 2, guaranteeing it works for everyone!)*
 
 ## Step 2: Export the Image
 
@@ -33,6 +33,7 @@ Inside that new `FinHealthSnap_App` folder, create a file named `docker-compose.
 **Do NOT use your development compose file!** Paste the following code into it. Notice that it uses `image:` instead of `build: .` so that it doesn't require the source code.
 
 ```yaml
+version: '3.8'
 services:
   finhealthsnap:
     image: finhealthsnap-release:latest
@@ -65,6 +66,6 @@ Your `FinHealthSnap_App` folder should now contain exactly two files:
 1. `finhealthsnap-release.tar`
 2. `docker-compose.yml`
 
-*(Optional: If you want to provide the user with existing data, create a folder named `prisma` in here and paste your `dev.db` inside it, then instruct them to use Option 2 in the compose file).*
+*(Optional: If you want to provide the user with existing data, simply create a folder named `prisma` next to the `docker-compose.yml` file and place your `dev.db` inside it before zipping!)*
 
 Zip this folder and send it to the user! Provide them with the `SETUP_MAC.md` or `SETUP_WINDOWS.md` guide.
