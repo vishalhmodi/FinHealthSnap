@@ -73,11 +73,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
       itemType: string;
       amount: number;
       sortOrder?: number;
+      linkedAssetId?: string;
     }[]) {
       if (item.id) {
         await prisma.customAssetLiability.update({
           where: { id: item.id },
-          data: { amount: item.amount, name: item.name, detail: item.detail, itemType: item.itemType, sortOrder: item.sortOrder ?? 0 },
+          data: { amount: item.amount, name: item.name, detail: item.detail, itemType: item.itemType, sortOrder: item.sortOrder ?? 0, linkedAssetId: item.linkedAssetId ?? null },
         });
       } else {
         await prisma.customAssetLiability.create({
@@ -89,6 +90,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
             itemType: item.itemType,
             amount: item.amount,
             sortOrder: item.sortOrder ?? 0,
+            linkedAssetId: item.linkedAssetId ?? null,
           },
         });
       }

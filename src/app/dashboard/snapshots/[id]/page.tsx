@@ -29,6 +29,7 @@ interface CustomItem {
   itemType: string;
   amount: number;
   sortOrder: number;
+  linkedAssetId?: string;
 }
 
 interface QuarterData {
@@ -483,12 +484,30 @@ export default function SnapshotPage() {
                         onClick={() => removeCustomItem(idx)}
                         title="Remove Item"
                       >×</button>
+                      {item.itemType === 'LIABILITY' && (
+                        <select
+                          className="form-input"
+                          value={item.linkedAssetId || ''}
+                          onChange={(e) => handleCustomChange(idx, 'linkedAssetId', e.target.value || undefined)}
+                          style={{ minWidth: '100%', marginTop: '4px', fontSize: '0.8rem', padding: '4px' }}
+                        >
+                          <option value="">-- No Linked Asset --</option>
+                          {items.filter(i => i.itemType === 'ASSET' && i.id).map(i => (
+                            <option key={i.id} value={i.id}>Links to: {i.name} ({i.detail})</option>
+                          ))}
+                        </select>
+                      )}
                     </div>
                   ) : (
                     <div className={styles.customViewRow}>
                       <div className={styles.customItemMeta}>
                         <span className={styles.customItemName}>{item.name}</span>
                         <span className={styles.customItemDetail}>{item.detail}</span>
+                        {item.linkedAssetId && item.itemType === 'LIABILITY' && (
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-liability-text)', display: 'block', marginTop: '2px' }}>
+                            ↳ Linked to: {items.find(i => i.id === item.linkedAssetId)?.name || 'Unknown Asset'}
+                          </span>
+                        )}
                       </div>
                       <span className={`font-mono ${item.itemType === 'ASSET' ? 'amount-positive' : 'amount-negative'}`}>
                         {item.itemType === 'LIABILITY' ? '-' : ''}{formatCurrency(item.amount)}

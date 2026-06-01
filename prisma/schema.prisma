@@ -127,4 +127,8 @@ model CustomAssetLiability {
   amount    Float    // Always positive; sign determined by itemType
   sortOrder Int      @default(0)
   updatedAt DateTime @updatedAt
+
+  linkedAssetId String?
+  linkedAsset   CustomAssetLiability?  @relation("LinkedAsset", fields: [linkedAssetId], references: [id])
+  linkedLiabilities CustomAssetLiability[] @relation("LinkedAsset")
 }
