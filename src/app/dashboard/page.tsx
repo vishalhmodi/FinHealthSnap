@@ -311,7 +311,9 @@ export default function DashboardPage() {
         <div>
           <h1>Financial Dashboard</h1>
           <p className="text-sm">
-            {latest ? `Reference snapshot: ${latest.label}` : 'No data yet — add your first quarter'}
+            {latest 
+              ? `Reference snapshot: ${latest.label} (${new Date(latest.snapshotDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })})` 
+              : 'No data yet — add your first quarter'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
