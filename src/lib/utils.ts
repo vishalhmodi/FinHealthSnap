@@ -45,3 +45,11 @@ export function getChangePercent(current: number, previous: number): number {
   if (previous === 0) return 0;
   return ((current - previous) / Math.abs(previous)) * 100;
 }
+
+export function formatPercent(ratio: number): string {
+  return new Intl.NumberFormat('en-CA', {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(ratio);
+}
