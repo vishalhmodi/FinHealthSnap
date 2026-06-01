@@ -42,3 +42,4 @@ next-env.d.ts
 *.db
 *.sqlite
 /releases/
+/dev.db-bkup/
