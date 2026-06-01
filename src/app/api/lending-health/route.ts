@@ -7,8 +7,9 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const quarters = await prisma.quarter.findMany({
-    where: { userId: user.userId },
+  try {
+    const quarters = await prisma.quarter.findMany({
+      where: { userId: user.userId },
     include: {
       balances: { 
         include: { 
@@ -52,7 +53,7 @@ export async function GET() {
     const properties = q.customItems
       .filter(c => c.itemType === 'ASSET')
       .map(asset => {
-        const linkedDebt = asset.linkedLiabilities.reduce((sum, liab) => sum + liab.amount, 0);
+        const linkedDebt = (asset.linkedLiabilities || []).reduce((sum, liab) => sum + liab.amount, 0);
         return {
           id: asset.id,
           name: asset.name,
@@ -80,4 +81,8 @@ export async function GET() {
   const latest = trends[trends.length - 1] ?? null;
 
   return NextResponse.json({ trends, latest });
+  } catch (error: any) {
+    console.error('Lending Health API Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }

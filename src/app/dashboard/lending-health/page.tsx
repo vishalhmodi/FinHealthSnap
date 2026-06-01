@@ -37,8 +37,17 @@ export default function LendingHealthPage() {
 
   useEffect(() => {
     fetch('/api/lending-health')
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (!r.ok) {
+          const text = await r.text();
+          throw new Error(`API Error: ${r.status} - ${text}`);
+        }
+        return r.json();
+      })
       .then(setData)
+      .catch((err) => {
+        console.error('Failed to load lending health data:', err);
+      })
       .finally(() => setLoading(false));
   }, []);
 
