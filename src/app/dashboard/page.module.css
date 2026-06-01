@@ -470,7 +470,8 @@
   
   .chartsGrid { 
     display: flex !important;
-    flex-direction: column;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     gap: 16px;
   }
   
@@ -483,9 +484,21 @@
     break-inside: avoid !important;
     -webkit-column-break-inside: avoid !important;
     display: inline-block !important;
-    width: 100% !important;
+    width: calc(50% - 8px) !important;
     box-sizing: border-box !important;
     overflow: visible !important;
+    vertical-align: top !important;
+  }
+  
+  .fullWidthChart {
+    width: 100% !important;
+  }
+  
+  /* Safari Recharts hack to prevent absolute position tear-offs during print */
+  .recharts-responsive-container,
+  .recharts-responsive-container > div,
+  .recharts-wrapper {
+    position: relative !important;
   }
   
   .chartCard * {
