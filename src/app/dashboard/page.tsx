@@ -160,6 +160,11 @@ export default function DashboardPage() {
   const [showAssets, setShowAssets] = useState(true);
   const [showLiabilities, setShowLiabilities] = useState(true);
   const [showNetWorth, setShowNetWorth] = useState(true);
+  const [hiddenCategories, setHiddenCategories] = useState<Record<string, boolean>>({});
+
+  const toggleCategory = (cat: string) => {
+    setHiddenCategories(prev => ({ ...prev, [cat]: !prev[cat] }));
+  };
 
   useEffect(() => {
     fetch('/api/dashboard')
@@ -641,18 +646,41 @@ export default function DashboardPage() {
 
               {/* Category Growth */}
               <div className={`glass-card ${styles.chartCard}`}>
-                <h2 className={styles.chartTitle}>Investment Growth by Type</h2>
-                <p className={styles.chartSubtitle}>Trend of asset categories over time</p>
+                <div className={styles.chartTitleWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h2 className={styles.chartTitle} style={{ marginBottom: '4px' }}>Investment Growth by Type</h2>
+                    <p className={styles.chartSubtitle} style={{ margin: 0 }}>Trend of asset categories over time</p>
+                  </div>
+                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 0 }}>
+                    {allCategories.map((cat, i) => (
+                      <button 
+                        key={cat}
+                        onClick={() => toggleCategory(cat)}
+                        className={`${styles.legendItem} ${!hiddenCategories[cat] ? styles.active : ''}`}
+                      >
+                        <span className={styles.legendDot} style={{backgroundColor: CHART_COLORS[i % CHART_COLORS.length]}}></span> {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className={styles.chartWrapper}>
                   <ResponsiveContainer width="100%" height={260}>
                     <LineChart data={categoryChartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
+                      <YAxis domain={['auto', 'auto']} tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '12px' }} />
                       {allCategories.map((cat, i) => (
-                        <Line key={cat} type="monotone" dataKey={cat} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+                        <Line 
+                          key={cat} 
+                          type="monotone" 
+                          dataKey={cat} 
+                          stroke={CHART_COLORS[i % CHART_COLORS.length]} 
+                          strokeWidth={2.5} 
+                          dot={{ r: 3 }} 
+                          isAnimationActive={false} 
+                          hide={hiddenCategories[cat]}
+                        />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
