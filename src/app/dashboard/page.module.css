@@ -481,7 +481,8 @@
     page-break-inside: avoid; 
     break-inside: avoid;
     -webkit-column-break-inside: avoid;
-    display: block !important;
+    display: inline-block !important;
+    width: 100% !important;
   }
 
   .quarterRow {
