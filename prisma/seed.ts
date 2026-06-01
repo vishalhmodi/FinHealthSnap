@@ -13,15 +13,14 @@ const adapter = new PrismaLibSql({ url: `file:${dbPath}` });
 const prisma = new PrismaClient({ adapter } as any);
 
 async function main() {
-  console.log('Clearing existing data...');
-  await prisma.accountBalance.deleteMany();
-  await prisma.customAssetLiability.deleteMany();
-  await prisma.quarter.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.accountCategory.deleteMany();
-  await prisma.institution.deleteMany();
-  await prisma.owner.deleteMany();
-  await prisma.user.deleteMany();
+  console.log('Clearing existing seed users (leaving real user data intact)...');
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: ['user@example.com', 'demoUSA@snapshot.local', 'demoCA@snapshot.local']
+      }
+    }
+  });
 
   // Create User
   const passwordHash = await bcrypt.hash('password123', 10);
@@ -127,9 +126,9 @@ async function main() {
   );
 
   // Create Demo User (US)
-  const demoPasswordHash = await bcrypt.hash('DemoPassword123', 10);
+  const demoPasswordHash = await bcrypt.hash('DemoUSAPassword123', 10);
   await createUserWithData(
-    'demo@snapshot.local',
+    'demoUSA@snapshot.local',
     'Demo User',
     demoPasswordHash,
     rowData.slice(-4) // Just the last 4 quarters for the demo account
@@ -157,7 +156,7 @@ async function createUserWithData(email: string, name: string, passwordHash: str
   });
   const userId = user.id;
 
-  const isDemoUS = email === 'demo@snapshot.local';
+  const isDemoUS = email === 'demoUSA@snapshot.local';
   const isDemoCA = email === 'demoCA@snapshot.local';
   const isDemo = isDemoUS || isDemoCA;
 
@@ -234,6 +233,7 @@ async function createUserWithData(email: string, name: string, passwordHash: str
 
     for (let i = 0; i < row.values.length; i++) {
       let amount = row.values[i];
+      if (email === 'user@example.com') amount = Math.round(amount / 0.70);
       if (isDemoUS) amount = amount * 0.85; 
       if (isDemoCA) amount = amount * 0.50; // Cut exactly in half per request
       
@@ -251,6 +251,7 @@ async function createUserWithData(email: string, name: string, passwordHash: str
     if (row.custom) {
       for (const c of row.custom) {
         let cAmount = c.amount;
+        if (email === 'user@example.com') cAmount = Math.round(cAmount / 0.70);
         if (isDemoUS) cAmount = cAmount * 0.85;
         if (isDemoCA) cAmount = cAmount * 0.50; // 1M * 0.50 = 500K
         

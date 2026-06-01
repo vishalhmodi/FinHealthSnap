@@ -67,7 +67,7 @@ export default function LoginPage() {
               id="email"
               type="email"
               className="form-input"
-              placeholder="demo@snapshot.local"
+              placeholder="demoUSA@snapshot.local"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -143,11 +143,15 @@ export default function LoginPage() {
         </form>
 
         <div className={styles.hint} style={{ marginTop: '1rem', flexDirection: 'column', gap: '0.5rem' }}>
-          <div>
-            <span>Demo credentials:</span>
-            <code>demo@snapshot.local</code>
-            <span>/</span>
-            <code>DemoPassword123</code>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div>
+              <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>US Demo:</span><br/>
+              <code>demoUSA@snapshot.local</code> <span>/</span> <code>DemoUSAPassword123</code>
+            </div>
+            <div>
+              <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>CA Demo:</span><br/>
+              <code>demoCA@snapshot.local</code> <span>/</span> <code>DemoCAPassword123</code>
+            </div>
           </div>
           <div style={{ marginTop: '0.5rem' }}>
             <span>Don't have an account?</span>
