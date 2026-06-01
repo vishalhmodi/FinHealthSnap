@@ -52,3 +52,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Quick Reference Commands
+
+Here are some helpful commands for developing, building, and generating documentation:
+
+**Start the Development Server:**
+```bash
+npm run dev
+```
+
+**Database Commands:**
+```bash
+npx prisma db push    # Pushes schema changes to the local database
+npx prisma db seed    # Populates the database with default demo data
+```
+
+**Build the Production Docker Image (Multi-Platform):**
+```bash
+docker buildx build --platform linux/amd64 -t finhealthsnap-release:latest --load .
+```
+
+**Generate PDF Documentation:**
+```bash
+# Converts the Windows Setup markdown guide into a PDF format
+npx md-to-pdf docs/Application-Setup_windows.md
+
+# Converts the Mac Setup markdown guide into a PDF format
+npx md-to-pdf docs/Application-Setup_mac.md
+```
