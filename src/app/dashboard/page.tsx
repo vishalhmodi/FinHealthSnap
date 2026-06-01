@@ -161,9 +161,19 @@ export default function DashboardPage() {
   const [showLiabilities, setShowLiabilities] = useState(true);
   const [showNetWorth, setShowNetWorth] = useState(true);
   const [hiddenCategories, setHiddenCategories] = useState<Record<string, boolean>>({});
+  const [hiddenInstitutions, setHiddenInstitutions] = useState<Record<string, boolean>>({});
+  const [hiddenOwners, setHiddenOwners] = useState<Record<string, boolean>>({});
 
   const toggleCategory = (cat: string) => {
     setHiddenCategories(prev => ({ ...prev, [cat]: !prev[cat] }));
+  };
+
+  const toggleInstitution = (inst: string) => {
+    setHiddenInstitutions(prev => ({ ...prev, [inst]: !prev[inst] }));
+  };
+
+  const toggleOwner = (owner: string) => {
+    setHiddenOwners(prev => ({ ...prev, [owner]: !prev[owner] }));
   };
 
   useEffect(() => {
@@ -689,18 +699,41 @@ export default function DashboardPage() {
 
               {/* Institution Growth */}
               <div className={`glass-card ${styles.chartCard}`}>
-                <h2 className={styles.chartTitle}>Growth by Institution</h2>
-                <p className={styles.chartSubtitle}>Trend of assets across different institutions</p>
+                <div className={styles.chartTitleWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h2 className={styles.chartTitle} style={{ marginBottom: '4px' }}>Growth by Institution</h2>
+                    <p className={styles.chartSubtitle} style={{ margin: 0 }}>Trend of assets across different institutions</p>
+                  </div>
+                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 0 }}>
+                    {allInstitutions.map((inst, i) => (
+                      <button 
+                        key={inst}
+                        onClick={() => toggleInstitution(inst)}
+                        className={`${styles.legendItem} ${!hiddenInstitutions[inst] ? styles.active : ''}`}
+                      >
+                        <span className={styles.legendDot} style={{backgroundColor: CHART_COLORS[i % CHART_COLORS.length]}}></span> {inst}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className={styles.chartWrapper}>
                   <ResponsiveContainer width="100%" height={260}>
                     <LineChart data={institutionChartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
+                      <YAxis domain={['auto', 'auto']} tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '12px' }} />
                       {allInstitutions.map((inst, i) => (
-                        <Line key={inst} type="monotone" dataKey={inst} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+                        <Line 
+                          key={inst} 
+                          type="monotone" 
+                          dataKey={inst} 
+                          stroke={CHART_COLORS[i % CHART_COLORS.length]} 
+                          strokeWidth={2.5} 
+                          dot={{ r: 3 }} 
+                          isAnimationActive={false} 
+                          hide={hiddenInstitutions[inst]}
+                        />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
@@ -709,18 +742,41 @@ export default function DashboardPage() {
 
               {/* Owner Growth */}
               <div className={`glass-card ${styles.chartCard}`}>
-                <h2 className={styles.chartTitle}>Growth by Individual</h2>
-                <p className={styles.chartSubtitle}>Trend of assets per family member/entity</p>
+                <div className={styles.chartTitleWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <h2 className={styles.chartTitle} style={{ marginBottom: '4px' }}>Growth by Individual</h2>
+                    <p className={styles.chartSubtitle} style={{ margin: 0 }}>Trend of assets per family member/entity</p>
+                  </div>
+                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 0 }}>
+                    {allOwners.map((own, i) => (
+                      <button 
+                        key={own}
+                        onClick={() => toggleOwner(own)}
+                        className={`${styles.legendItem} ${!hiddenOwners[own] ? styles.active : ''}`}
+                      >
+                        <span className={styles.legendDot} style={{backgroundColor: CHART_COLORS[i % CHART_COLORS.length]}}></span> {own}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className={styles.chartWrapper}>
                   <ResponsiveContainer width="100%" height={260}>
                     <LineChart data={ownerChartData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border-strong)" />
                       <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
+                      <YAxis domain={['auto', 'auto']} tickFormatter={(v) => formatCurrencyCompact(v)} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} tickLine={false} width={65} />
                       <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '12px' }} />
                       {allOwners.map((own, i) => (
-                        <Line key={own} type="monotone" dataKey={own} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2.5} dot={{ r: 3 }} isAnimationActive={false} />
+                        <Line 
+                          key={own} 
+                          type="monotone" 
+                          dataKey={own} 
+                          stroke={CHART_COLORS[i % CHART_COLORS.length]} 
+                          strokeWidth={2.5} 
+                          dot={{ r: 3 }} 
+                          isAnimationActive={false} 
+                          hide={hiddenOwners[own]}
+                        />
                       ))}
                     </LineChart>
                   </ResponsiveContainer>
