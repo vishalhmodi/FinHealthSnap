@@ -656,12 +656,12 @@ export default function DashboardPage() {
 
               {/* Category Growth */}
               <div className={`glass-card ${styles.chartCard}`}>
-                <div className={styles.chartTitleWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                <div className={styles.chartTitleWrapper} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: '16px', gap: '12px' }}>
                   <div>
                     <h2 className={styles.chartTitle} style={{ marginBottom: '4px' }}>Investment Growth by Type</h2>
                     <p className={styles.chartSubtitle} style={{ margin: 0 }}>Trend of asset categories over time</p>
                   </div>
-                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 0 }}>
+                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-start', marginTop: 0 }}>
                     {allCategories.map((cat, i) => (
                       <button 
                         key={cat}
@@ -699,12 +699,12 @@ export default function DashboardPage() {
 
               {/* Institution Growth */}
               <div className={`glass-card ${styles.chartCard}`}>
-                <div className={styles.chartTitleWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                <div className={styles.chartTitleWrapper} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: '16px', gap: '12px' }}>
                   <div>
                     <h2 className={styles.chartTitle} style={{ marginBottom: '4px' }}>Growth by Institution</h2>
                     <p className={styles.chartSubtitle} style={{ margin: 0 }}>Trend of assets across different institutions</p>
                   </div>
-                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 0 }}>
+                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-start', marginTop: 0 }}>
                     {allInstitutions.map((inst, i) => (
                       <button 
                         key={inst}
@@ -742,12 +742,12 @@ export default function DashboardPage() {
 
               {/* Owner Growth */}
               <div className={`glass-card ${styles.chartCard}`}>
-                <div className={styles.chartTitleWrapper} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                <div className={styles.chartTitleWrapper} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginBottom: '16px', gap: '12px' }}>
                   <div>
                     <h2 className={styles.chartTitle} style={{ marginBottom: '4px' }}>Growth by Individual</h2>
                     <p className={styles.chartSubtitle} style={{ margin: 0 }}>Trend of assets per family member/entity</p>
                   </div>
-                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 0 }}>
+                  <div className={styles.compactLegend} style={{ flexWrap: 'wrap', justifyContent: 'flex-start', marginTop: 0 }}>
                     {allOwners.map((own, i) => (
                       <button 
                         key={own}
