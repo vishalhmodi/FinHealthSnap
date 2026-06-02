@@ -37,26 +37,10 @@
   flex-direction: column;
   align-items: center;
   padding: 40px 24px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
   text-align: center;
 }
 
-/* The mock image had a dark background for this specific card, but we will make it responsive or force a dark slate color */
-.scorePanelDark {
-  background: #0f172a;
-  border-color: #1e293b;
-  color: #f8fafc;
-}
 
-.scorePanelDark h2 {
-  color: #f8fafc;
-}
-
-.scorePanelDark .scoreSubtext {
-  color: #94a3b8;
-}
 
 .scorePanel h2 {
   font-size: 1.25rem;
@@ -138,9 +122,6 @@
 }
 
 .miniCard {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -176,9 +157,9 @@
 }
 
 .miniCardValue {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   margin-bottom: 4px;
   display: inline-block;
 }
@@ -258,9 +239,6 @@
 .chartPanel {
   grid-column: 2;
   grid-row: 2;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
   padding: 24px;
   display: flex;
   flex-direction: column;

@@ -129,8 +129,8 @@ export default function LendingHealthPage() {
   };
 
   const getLeverageStatus = (ratio: number) => {
-    if (ratio < 0.4) return 'Good';
-    if (ratio < 0.6) return 'Warn';
+    if (ratio < 0.2) return 'Good';
+    if (ratio < 0.5) return 'Warn';
     return 'Danger';
   };
 
@@ -197,7 +197,7 @@ export default function LendingHealthPage() {
       <div className={styles.dashboardGrid}>
         
         {/* LEFT PANEL: OVERALL HEALTH SCORE */}
-        <div className={`${styles.scorePanel} ${styles.scorePanelDark}`}>
+        <div className={`${styles.scorePanel} glass-card`}>
           <h2>Overall Health Score</h2>
           <div className={styles.circularScore}>
             <svg className={styles.scoreCircleSvg} viewBox="0 0 200 120">
@@ -234,7 +234,7 @@ export default function LendingHealthPage() {
         {/* TOP RIGHT: CORE METRICS ROW */}
         <div className={styles.metricsRow}>
           {/* Debt-to-Asset Ratio */}
-          <div className={styles.miniCard}>
+          <div className={`${styles.miniCard} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconOrange}`}>📊</div>
               <div className={styles.miniCardTitle}>Debt-to-Asset Ratio</div>
@@ -264,12 +264,12 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={`${styles.miniCardIdeal} ${styles['status' + getLeverageStatus(current.leverageRatio)]}`}>
-              {getLeverageStatus(current.leverageRatio) === 'Good' ? 'Good' : 'Moderate'}
+              {getLeverageStatus(current.leverageRatio) === 'Good' ? 'Good' : getLeverageStatus(current.leverageRatio) === 'Warn' ? 'Moderate' : 'Poor'}
             </div>
           </div>
 
           {/* Liquidity to Debt Ratio */}
-          <div className={styles.miniCard}>
+          <div className={`${styles.miniCard} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconGreen}`}>💧</div>
               <div className={styles.miniCardTitle}>Liquidity to Debt Ratio</div>
@@ -304,7 +304,7 @@ export default function LendingHealthPage() {
           </div>
 
           {/* Aggregate LTV */}
-          <div className={styles.miniCard}>
+          <div className={`${styles.miniCard} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconYellow}`}>🏠</div>
               <div className={styles.miniCardTitle}>Aggregate LTV</div>
@@ -340,7 +340,7 @@ export default function LendingHealthPage() {
         </div>
 
         {/* BOTTOM RIGHT: LTV BREAKDOWN CHART */}
-        <div className={styles.chartPanel}>
+        <div className={`${styles.chartPanel} glass-card`}>
           <h2>LTV by Property</h2>
           {current.properties.length === 0 ? (
             <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '40px' }}>
@@ -348,7 +348,7 @@ export default function LendingHealthPage() {
             </p>
           ) : (
             <div className={styles.chartContainer}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minHeight={350}>
                 <BarChart data={chartData} margin={{ top: 30, right: 30, left: 0, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                   <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickMargin={10} axisLine={false} tickLine={false} />
