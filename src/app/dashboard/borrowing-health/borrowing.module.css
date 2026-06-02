@@ -374,10 +374,15 @@
     padding: 20px;
     box-shadow: none !important;
   }
-  .scorePanel, .chartPanel, .miniCard {
+  .scorePanel, .chartPanel, .miniCard, .recommendationBanner {
     break-inside: avoid;
     page-break-inside: avoid;
     border: 1px solid #ddd !important;
+    background: transparent !important;
+    color: #000 !important;
+  }
+  .recommendationBanner {
+    border-left: 6px solid var(--accent) !important;
   }
   .metricsRow {
     grid-template-columns: repeat(3, 1fr);
