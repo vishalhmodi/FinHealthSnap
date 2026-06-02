@@ -219,14 +219,14 @@ export default function LendingHealthPage() {
                 cx="100" cy="100" r="80" 
                 fill="none" 
                 stroke="var(--glass-border-strong)" 
-                strokeWidth="20" 
+                strokeWidth="16" 
               />
               {/* Animated Progress Ring */}
               <circle 
                 cx="100" cy="100" r="80" 
                 fill="none" 
                 stroke={getScoreColor(current.healthScore)}
-                strokeWidth="20" 
+                strokeWidth="16" 
                 strokeLinecap="round"
                 strokeDasharray={circleCircumference}
                 strokeDashoffset={strokeDashoffset}
@@ -284,7 +284,7 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={styles.miniCardDesc}>
-              A high ratio means you owe more compared to what you own. Keeping this under 20% (Good) strongly boosts your score.
+              A high ratio means you owe more compared to what you own. Levels: <strong>Good (&lt;20%)</strong>, <strong>Moderate (20-50%)</strong>, <strong>Poor (&gt;50%)</strong>. Keeping this under 20% strongly boosts your score.
             </div>
           </div>
 
@@ -323,7 +323,7 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={styles.miniCardDesc}>
-              Measures your ability to cover debts with easily accessible cash. Over 100% (Strong) is ideal for lending safety.
+              Measures your ability to cover debts with easily accessible cash. Levels: <strong>Strong (&gt;100%)</strong>, <strong>Moderate (50-100%)</strong>, <strong>Weak (&lt;50%)</strong>. Over 100% is ideal for lending safety.
             </div>
           </div>
 
@@ -362,7 +362,7 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={styles.miniCardDesc}>
-              The ratio of your mortgage balances to property values. Lenders prefer this under 80% (Good) to offer the best rates.
+              The ratio of your mortgage balances to property values. Levels: <strong>Good (&lt;80%)</strong>, <strong>High (80-90%)</strong>, <strong>Critical (&gt;90%)</strong>. Lenders prefer under 80% to offer the best rates.
             </div>
           </div>
         </div>

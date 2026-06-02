@@ -38,6 +38,20 @@
   align-items: center;
   padding: 40px 24px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.scorePanel::before,
+.chartPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0.7;
 }
 
 
@@ -51,11 +65,12 @@
 .circularScore {
   position: relative;
   width: 200px;
-  height: 120px;
+  height: 200px;
+  margin-top: 32px;
+  margin-bottom: 16px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  align-items: center;
 }
 
 .scoreCircleSvg {
@@ -93,7 +108,7 @@
 }
 
 .scoreValue {
-  font-size: 4.5rem;
+  font-size: 3.5rem;
   font-weight: 700;
   line-height: 1;
   font-family: var(--font-mono);
@@ -273,6 +288,7 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .chartPanel h2 {
