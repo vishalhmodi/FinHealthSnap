@@ -376,7 +376,7 @@ export default function BorrowingHealthPage() {
             </p>
           ) : (
             <div className={styles.chartContainer}>
-              <ResponsiveContainer width="100%" height="100%" minHeight={350}>
+              <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={chartData} margin={{ top: 30, right: 30, left: 0, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                   <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickMargin={10} axisLine={false} tickLine={false} />
