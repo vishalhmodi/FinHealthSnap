@@ -12,6 +12,7 @@ import { formatCurrency, formatCurrencyCompact, getChangePercent } from '@/lib/u
 interface TrendPoint {
   label: string;
   quarterId: string;
+  snapshotDate: string;
   totalAssets: number;
   liquidAssets: number;
   nonLiquidAssets: number;

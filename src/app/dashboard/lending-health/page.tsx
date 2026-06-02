@@ -383,7 +383,7 @@ export default function LendingHealthPage() {
                   <YAxis unit="%" stroke="var(--text-muted)" fontSize={12} domain={[0, 100]} axisLine={false} tickLine={false} />
                   <Tooltip cursor={{ fill: 'transparent' }} content={<CustomRechartsTooltip />} />
                   <Bar dataKey="ltv" radius={[6, 6, 0, 0]} maxBarSize={60}>
-                    <LabelList dataKey="ltv" position="top" formatter={(val: number) => val.toFixed(1) + '%'} style={{ fontWeight: 600 }} />
+                    <LabelList dataKey="ltv" position="top" formatter={(val: any) => typeof val === 'number' ? val.toFixed(1) + '%' : val} style={{ fill: 'var(--color-text-strong)', fontSize: '0.85rem' }} />
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
