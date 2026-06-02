@@ -72,7 +72,21 @@ volumes:
 EOF
 
 echo ""
+echo "-> Copying Setup Instructions"
+cp docs/Application-Setup_mac.pdf "${RELEASE_DIR}/"
+cp docs/Application-Setup_windows.pdf "${RELEASE_DIR}/"
+cp releases/update-db-add-category.sh "${RELEASE_DIR}/" 2>/dev/null || true
+cp releases/update-db-add-category.bat "${RELEASE_DIR}/" 2>/dev/null || true
+
+echo ""
+echo "-> Creating ZIP archive"
+cd "$BASE_DIR"
+zip -r "${PREFIX}-${SUFFIX}.zip" "${PREFIX}-${SUFFIX}"
+cd ..
+
+echo ""
 echo "=================================================="
 echo "Success! Release package is ready:"
 echo "Location: $(pwd)/${RELEASE_DIR}"
+echo "Zip Archive: $(pwd)/${RELEASE_DIR}.zip"
 echo "=================================================="
