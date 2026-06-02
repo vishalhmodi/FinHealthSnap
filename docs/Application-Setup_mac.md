@@ -38,13 +38,21 @@ If you received an existing `dev.db` file containing old data:
    ```
 5. Delete the bottom two lines (`volumes:` and `  finhealth-db:`).
 
-## Step 4: Launch the Application
+## Step 4: Update Database Schema (If Upgrading)
+If you are upgrading from an older version of FinHealthSnap and brought over your old `dev.db` file, you must update the database schema to support new features.
+In your Terminal (inside the `FinHealthSnap_App` folder), run:
+```bash
+./update-db-add-category.sh
+```
+*(Note: If you are starting fresh with Option A, you can skip this step.)*
+
+## Step 5: Launch the Application
 In your Terminal (still inside the `FinHealthSnap_App` folder), run:
 ```bash
 docker compose up -d
 ```
 
-## Step 5: Access the App
+## Step 6: Access the App
 1. Open your web browser and go to: **[http://localhost:3005](http://localhost:3005)**
 2. If you chose Option A (Fresh Start), click "Register" or "Sign Up" to create your new account.
 3. If you chose Option B, log in with your existing credentials.

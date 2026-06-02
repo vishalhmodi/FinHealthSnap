@@ -75,3 +75,11 @@ Use this account to log in (created in Step 6):
 - **Password:** `password123`
 
 *(When you are done using the app, you can go back to the Command Prompt window and press `Ctrl + C`, then type `Y` and press Enter to shut it down).*
+
+## Upgrading an Existing Installation
+If you previously set up the application and have downloaded the latest code from GitHub to update your existing setup, you must ensure your database schema is upgraded.
+To easily upgrade the database, open Command Prompt, navigate to your project folder, and run the included batch script:
+```cmd
+releases\update-db-add-category.bat
+```
+This script will safely migrate your local `dev.db` schema to support the newest features without data loss.
