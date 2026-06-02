@@ -5,9 +5,9 @@ import { useParams, useRouter } from 'next/navigation';
 import styles from './snapshot.module.css';
 import { formatCurrency } from '@/lib/utils';
 
-interface Owner { id: string; name: string; }
-interface Category { id: string; name: string; sortOrder: number; }
-interface Institution { id: string; name: string; }
+interface Owner { id: string; name: string; isExcluded?: boolean; }
+interface Category { id: string; name: string; sortOrder: number; isExcluded?: boolean; }
+interface Institution { id: string; name: string; isExcluded?: boolean; }
 
 interface AccountEntry {
   id: string;
@@ -15,6 +15,16 @@ interface AccountEntry {
   institution: Institution;
   owner: Owner;
   isExcluded: boolean;
+}
+
+function isBalExcluded(bal: Balance | undefined): boolean {
+  if (!bal) return false;
+  return !!(
+    bal.account.isExcluded ||
+    bal.account.category.isExcluded ||
+    bal.account.owner.isExcluded ||
+    bal.account.institution.isExcluded
+  );
 }
 
 interface Balance {
@@ -64,14 +74,14 @@ function buildCategoryGrid(
   const ownerTotals: Record<string, number> = {};
   for (const o of owners) {
     ownerTotals[o.id] = catBalances
-      .filter((b) => b.account.owner.id === o.id && !b.account.isExcluded)
+      .filter((b) => b.account.owner.id === o.id && !isBalExcluded(b))
       .reduce((sum, b) => sum + (editAmounts[b.accountId] ?? b.amount), 0);
   }
   // Institution totals
   const institutionTotals: Record<string, number> = {};
   for (const inst of institutions) {
     institutionTotals[inst.id] = catBalances
-      .filter((b) => b.account.institution.id === inst.id && !b.account.isExcluded)
+      .filter((b) => b.account.institution.id === inst.id && !isBalExcluded(b))
       .reduce((sum, b) => sum + (editAmounts[b.accountId] ?? b.amount), 0);
   }
 
@@ -90,9 +100,9 @@ function buildCategoryGrid(
 
       {/* Column headers */}
       <div className={styles.catColRow}>
-        <div className={styles.catCategoryLabel}>{categoryName}</div>
+        <div className={styles.catCategoryLabel} style={{ textDecoration: catBalances[0]?.account.category.isExcluded ? 'line-through' : 'none' }}>{categoryName}</div>
         {institutions.map((inst) => (
-          <div key={inst.id} className={styles.catColLabel}>{inst.name}</div>
+          <div key={inst.id} className={styles.catColLabel} style={{ textDecoration: inst.isExcluded ? 'line-through' : 'none' }}>{inst.name}</div>
         ))}
         <div className={styles.catColLabel}>Total</div>
       </div>
@@ -101,13 +111,13 @@ function buildCategoryGrid(
       {owners.map((owner) => {
         const ownerRowTotal = institutions.reduce((sum, inst) => {
           const bal = catBalances.find((b) => b.account.owner.id === owner.id && b.account.institution.id === inst.id);
-          if (bal && bal.account.isExcluded) return sum;
+          if (bal && isBalExcluded(bal)) return sum;
           return sum + (bal ? (editAmounts[bal.accountId] ?? bal.amount) : 0);
         }, 0);
 
         return (
           <div key={owner.id} className={styles.catDataRow}>
-            <div className={styles.catOwnerLabel}>{owner.name}</div>
+            <div className={styles.catOwnerLabel} style={{ textDecoration: owner.isExcluded ? 'line-through' : 'none' }}>{owner.name}</div>
             {institutions.map((inst) => {
               const bal = catBalances.find(
                 (b) => b.account.owner.id === owner.id && b.account.institution.id === inst.id
@@ -116,7 +126,7 @@ function buildCategoryGrid(
               return (
                 <div key={inst.id} className={styles.catCell}>
                   {editing && bal ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: bal.account.isExcluded ? 0.5 : 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: isBalExcluded(bal) ? 0.5 : 1 }}>
                       <input
                         type="number"
                         className={`form-input form-input-currency ${styles.balanceInput}`}
@@ -142,7 +152,7 @@ function buildCategoryGrid(
                       >×</button>
                     </div>
                   ) : (
-                    <span className="font-mono" style={{ textDecoration: bal?.account.isExcluded ? 'line-through' : 'none', opacity: bal?.account.isExcluded ? 0.5 : 1 }}>{bal ? formatCurrency(val) : '-'}</span>
+                    <span className="font-mono" style={{ textDecoration: isBalExcluded(bal) ? 'line-through' : 'none', opacity: isBalExcluded(bal) ? 0.5 : 1 }}>{bal ? formatCurrency(val) : '-'}</span>
                   )}
                 </div>
               );
@@ -339,7 +349,7 @@ export default function SnapshotPage() {
 
   // Summary computations
   const totalAccountAssets = quarter.balances
-    .filter((b) => !b.account.isExcluded)
+    .filter((b) => !isBalExcluded(b))
     .reduce(
       (sum, b) => sum + (editing ? (editAmounts[b.accountId] ?? b.amount) : b.amount),
       0

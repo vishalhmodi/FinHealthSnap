@@ -3,9 +3,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import styles from './page.module.css';
 
-interface Category { id: string; name: string; }
-interface Owner { id: string; name: string; }
-interface Institution { id: string; name: string; }
+interface Category { id: string; name: string; isExcluded: boolean; }
+interface Owner { id: string; name: string; isExcluded: boolean; }
+interface Institution { id: string; name: string; isExcluded: boolean; }
 
 export default function SettingsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -78,6 +78,24 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleToggleExclude(type: 'CATEGORY' | 'OWNER' | 'INSTITUTION', id: string, currentIsExcluded: boolean) {
+    try {
+      const res = await fetch(`/api/settings/${id}?type=${type}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isExcluded: !currentIsExcluded })
+      });
+      if (res.ok) {
+        loadData();
+      } else {
+        const d = await res.json();
+        alert(d.error || 'Failed to toggle exclusion');
+      }
+    } catch (e) {
+      alert('Network error');
+    }
+  }
+
   async function handlePasswordChange(e: React.FormEvent) {
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
@@ -118,9 +136,21 @@ export default function SettingsPage() {
         {items.length === 0 ? (
           <div className={styles.emptyText}>No items added yet.</div>
         ) : items.map(item => (
-          <div key={item.id} className={styles.itemRow}>
-            <span>{item.name}</span>
-            <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--color-liability-text)' }} onClick={() => handleDelete(type.startsWith('CUSTOM_CATEGORY') ? 'CUSTOM_CATEGORY' : (type as 'CATEGORY' | 'OWNER' | 'INSTITUTION'), item.id)}>×</button>
+          <div key={item.id} className={styles.itemRow} style={{ opacity: item.isExcluded ? 0.6 : 1 }}>
+            <span style={{ textDecoration: item.isExcluded ? 'line-through' : 'none' }}>{item.name}</span>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {!type.startsWith('CUSTOM_CATEGORY') && (
+                <button 
+                  className="btn btn-ghost btn-sm" 
+                  style={{ padding: '0 8px' }} 
+                  onClick={() => handleToggleExclude(type as any, item.id, item.isExcluded)}
+                  title={item.isExcluded ? "Include" : "Exclude"}
+                >
+                  {item.isExcluded ? '🚫' : '👁️'}
+                </button>
+              )}
+              <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--color-liability-text)' }} onClick={() => handleDelete(type.startsWith('CUSTOM_CATEGORY') ? 'CUSTOM_CATEGORY' : (type as 'CATEGORY' | 'OWNER' | 'INSTITUTION'), item.id)}>×</button>
+            </div>
           </div>
         ))}
       </div>

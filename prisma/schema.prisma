@@ -51,6 +51,7 @@ model AccountCategory {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String   // e.g. "TFSA", "RRSP", "RESP", "General"
   sortOrder Int      @default(0)
+  isExcluded Boolean @default(false)
   createdAt DateTime @default(now())
 
   accounts Account[]
@@ -64,6 +65,7 @@ model Institution {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String   // e.g. "TD", "RBC", "SunLife", "Manulife"
+  isExcluded Boolean @default(false)
   createdAt DateTime @default(now())
 
   accounts Account[]
@@ -77,6 +79,7 @@ model Owner {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String   // e.g. "John", "Jane", "Family", "Kids"
+  isExcluded Boolean @default(false)
   createdAt DateTime @default(now())
 
   accounts Account[]
