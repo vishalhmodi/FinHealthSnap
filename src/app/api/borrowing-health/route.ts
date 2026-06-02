@@ -14,7 +14,7 @@ export async function GET() {
       balances: { 
         include: { 
           account: { 
-            include: { category: true } 
+            include: { category: true, owner: true, institution: true } 
           } 
         } 
       },
@@ -33,7 +33,7 @@ export async function GET() {
     const q = quarters.find((x) => x.label === label)!;
 
     const liquidAssets = q.balances
-      .filter((b) => !b.account.isExcluded)
+      .filter((b) => !b.account.isExcluded && !b.account.category.isExcluded && !b.account.owner.isExcluded && !b.account.institution.isExcluded)
       .reduce((sum, b) => sum + b.amount, 0);
     const nonLiquidAssets = q.customItems
       .filter((c) => c.itemType === 'ASSET')

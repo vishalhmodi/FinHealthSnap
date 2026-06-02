@@ -38,3 +38,48 @@ export async function DELETE(
     return NextResponse.json({ error: 'Failed to delete item.' }, { status: 500 });
   }
 }
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
+  const searchParams = request.nextUrl.searchParams;
+  const type = searchParams.get('type');
+  const body = await request.json();
+  const { isExcluded } = body;
+
+  if (typeof isExcluded !== 'boolean') {
+    return NextResponse.json({ error: 'Invalid payload: isExcluded must be a boolean' }, { status: 400 });
+  }
+
+  try {
+    let updated;
+    if (type === 'CATEGORY') {
+      updated = await prisma.accountCategory.update({
+        where: { id, userId: user.userId },
+        data: { isExcluded }
+      });
+    } else if (type === 'OWNER') {
+      updated = await prisma.owner.update({
+        where: { id, userId: user.userId },
+        data: { isExcluded }
+      });
+    } else if (type === 'INSTITUTION') {
+      updated = await prisma.institution.update({
+        where: { id, userId: user.userId },
+        data: { isExcluded }
+      });
+    } else {
+      return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    }
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Error updating setting:', error);
+    return NextResponse.json({ error: 'Failed to update item.' }, { status: 500 });
+  }
+}
