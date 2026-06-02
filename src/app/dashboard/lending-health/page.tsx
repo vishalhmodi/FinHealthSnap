@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LabelList } from 'recharts';
 import styles from './lending.module.css';
 import { formatCurrency, formatPercent } from '@/lib/utils';
 
@@ -20,6 +20,8 @@ interface TrendData {
   totalAssets: number;
   totalLiabilities: number;
   liquidAssets: number;
+  totalRealEstateValue: number;
+  totalRealEstateDebt: number;
   netWorth: number;
   leverageRatio: number;
   liquidityRatio: number;
@@ -32,6 +34,31 @@ interface DashboardData {
   trends: TrendData[];
   latest: TrendData | null;
 }
+
+const CustomRechartsTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className={styles.tooltipBox} style={{ visibility: 'visible', opacity: 1, position: 'relative', transform: 'none', bottom: 'auto', left: 'auto' }}>
+        <div style={{ fontWeight: 600, marginBottom: '8px' }}>{data.name}</div>
+        <div className={styles.tooltipRow}>
+          <span>Property Value:</span>
+          <strong>{formatCurrency(data.assetValue)}</strong>
+        </div>
+        <div className={styles.tooltipRow}>
+          <span>Linked Debt:</span>
+          <strong>{formatCurrency(data.linkedDebt)}</strong>
+        </div>
+        <div className={styles.tooltipDivider} />
+        <div className={styles.tooltipRow}>
+          <span>LTV:</span>
+          <strong>{data.ltv.toFixed(1)}%</strong>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function LendingHealthPage() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -63,7 +90,6 @@ export default function LendingHealthPage() {
 
   const current = latestIndex >= 0 ? trends[latestIndex] : null;
 
-  // Animate the score when it changes
   useEffect(() => {
     if (current?.healthScore) {
       setAnimatedScore(0);
@@ -95,7 +121,6 @@ export default function LendingHealthPage() {
     );
   }
 
-  // Helpers
   const getScoreStatus = (score: number) => {
     if (score >= 80) return { label: 'Excellent', cls: 'Good' };
     if (score >= 60) return { label: 'Good', cls: 'Good' };
@@ -126,21 +151,21 @@ export default function LendingHealthPage() {
   const circleCircumference = 2 * Math.PI * circleRadius;
   const strokeDashoffset = circleCircumference - (animatedScore / 100) * circleCircumference;
 
-  // Recommendation Logic
-  let recommendation = "You are in a great position for lending opportunities. Keep maintaining healthy ratios.";
+  let recommendation = "You're in a good position for lending opportunities.";
   if (current.healthScore < 60) {
     recommendation = "Your overall profile needs improvement before seeking major lending.";
   } else {
     if (current.totalPropertyLTV > 0.8) recommendation = "Consider lowering your property LTV to avoid mortgage insurance and get better rates.";
-    else if (current.liquidityRatio < 0.5) recommendation = "Increase your liquid assets to improve your debt coverage capability.";
-    else if (current.leverageRatio > 0.6) recommendation = "Your Debt-to-Asset ratio is high. Focus on paying down liabilities to strengthen your profile.";
+    else if (current.liquidityRatio < 0.5) recommendation = "Maintain liquidity and consider lowering debt to strengthen your profile.";
+    else if (current.leverageRatio > 0.6) recommendation = "Your Debt-to-Asset ratio is high. Focus on paying down liabilities.";
   }
 
-  // Prepare chart data
   const chartData = current.properties.map(p => ({
     name: p.name,
-    ltv: p.ltv * 100, // percentage for chart
-    fill: p.ltv < 0.8 ? '#10b981' : p.ltv < 0.9 ? '#f59e0b' : '#ef4444'
+    assetValue: p.assetValue,
+    linkedDebt: p.linkedDebt,
+    ltv: p.ltv * 100,
+    fill: p.ltv < 0.8 ? '#10b981' : p.ltv < 0.9 ? '#f59e0b' : '#3b82f6' // Use blue for HELOC/others in the mock, or red for danger
   }));
 
   return (
@@ -148,7 +173,7 @@ export default function LendingHealthPage() {
       <div className={styles.pageHeader}>
         <div>
           <h1>Lending Health Dashboard</h1>
-          <p>A visual summary of your financial position for underwriters.</p>
+          <p>A visual summary of your financial position.</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           {trends.length > 0 && (
@@ -172,55 +197,141 @@ export default function LendingHealthPage() {
       <div className={styles.dashboardGrid}>
         
         {/* LEFT PANEL: OVERALL HEALTH SCORE */}
-        <div className={styles.scorePanel}>
+        <div className={`${styles.scorePanel} ${styles.scorePanelDark}`}>
           <h2>Overall Health Score</h2>
           <div className={styles.circularScore}>
             <svg className={styles.scoreCircleSvg} viewBox="0 0 200 200">
-              <circle cx="100" cy="100" r={circleRadius} className={styles.scoreBg} />
-              <circle 
-                cx="100" cy="100" r={circleRadius} 
+              {/* Semi-circle path (arc) instead of full circle */}
+              <path 
+                className={styles.scoreBg} 
+                d="M 20 100 A 80 80 0 0 1 180 100" 
+                strokeLinecap="round"
+              />
+              <path 
                 className={`${styles.scoreFill} ${styles['stroke' + scoreData.cls]}`}
-                strokeDasharray={circleCircumference}
-                strokeDashoffset={strokeDashoffset}
+                d="M 20 100 A 80 80 0 0 1 180 100"
+                strokeDasharray={251.2} /* PI * 80 */
+                strokeDashoffset={251.2 - (animatedScore / 100) * 251.2}
               />
             </svg>
-            <div className={styles.scoreTextContainer}>
+            <div className={styles.scoreTextContainer} style={{ transform: 'translateY(-10px)' }}>
               <div className={styles.scoreValue}>{current.healthScore}</div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/ 100</div>
+              <div style={{ fontSize: '1rem', color: '#94a3b8' }}>/100</div>
             </div>
           </div>
-          <div className={`${styles.scoreLabel} ${styles['status' + scoreData.cls]}`}>
+          <div className={`${styles.scoreLabel} ${styles['status' + scoreData.cls]}`} style={{ marginTop: '-40px' }}>
             {scoreData.label}
           </div>
-          <p className={styles.scoreSubtext}>
-            Based on a weighted average of your Leverage, Liquidity, and Real Estate LTV ratios.
+          <p className={styles.scoreSubtext} style={{ marginTop: '40px' }}>
+            You're in a {scoreData.label.toLowerCase()} position for<br/>lending opportunities.
           </p>
         </div>
 
         {/* TOP RIGHT: CORE METRICS ROW */}
         <div className={styles.metricsRow}>
+          {/* Debt-to-Asset Ratio */}
           <div className={styles.miniCard}>
-            <div className={styles.miniCardTitle}>Debt-to-Asset Ratio</div>
-            <div className={`${styles.miniCardValue} ${styles['status' + getLeverageStatus(current.leverageRatio)]}`}>
-              {formatPercent(current.leverageRatio)}
+            <div className={styles.miniCardHeader}>
+              <div className={`${styles.iconWrapper} ${styles.iconOrange}`}>📊</div>
+              <div className={styles.miniCardTitle}>Debt-to-Asset Ratio</div>
             </div>
-            <div className={styles.miniCardIdeal}>Ideal &lt; 40%</div>
+            
+            <div className={styles.tooltipContainer}>
+              <div className={`${styles.miniCardValue} ${styles['status' + getLeverageStatus(current.leverageRatio)]}`}>
+                {formatPercent(current.leverageRatio)}
+              </div>
+              
+              <div className={styles.tooltipBox}>
+                <div style={{ fontWeight: 600, marginBottom: '8px' }}>Calculation</div>
+                <div className={styles.tooltipRow}>
+                  <span>Total Liabilities:</span>
+                  <strong>{formatCurrency(current.totalLiabilities)}</strong>
+                </div>
+                <div className={styles.tooltipRow}>
+                  <span>Total Assets:</span>
+                  <strong>{formatCurrency(current.totalAssets)}</strong>
+                </div>
+                <div className={styles.tooltipDivider} />
+                <div className={styles.tooltipRow}>
+                  <span>Formula:</span>
+                  <strong>Liabilities ÷ Assets</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.miniCardIdeal} ${styles['status' + getLeverageStatus(current.leverageRatio)]}`}>
+              {getLeverageStatus(current.leverageRatio) === 'Good' ? 'Good' : 'Moderate'}
+            </div>
           </div>
 
+          {/* Liquidity to Debt Ratio */}
           <div className={styles.miniCard}>
-            <div className={styles.miniCardTitle}>Liquidity to Debt Ratio</div>
-            <div className={`${styles.miniCardValue} ${styles['status' + getLiquidityStatus(current.liquidityRatio)]}`}>
-              {formatPercent(current.liquidityRatio)}
+            <div className={styles.miniCardHeader}>
+              <div className={`${styles.iconWrapper} ${styles.iconGreen}`}>💧</div>
+              <div className={styles.miniCardTitle}>Liquidity to Debt Ratio</div>
             </div>
-            <div className={styles.miniCardIdeal}>Ideal &gt; 100%</div>
+
+            <div className={styles.tooltipContainer}>
+              <div className={`${styles.miniCardValue} ${styles['status' + getLiquidityStatus(current.liquidityRatio)]}`}>
+                {formatPercent(current.liquidityRatio)}
+              </div>
+
+              <div className={styles.tooltipBox}>
+                <div style={{ fontWeight: 600, marginBottom: '8px' }}>Calculation</div>
+                <div className={styles.tooltipRow}>
+                  <span>Liquid Assets:</span>
+                  <strong>{formatCurrency(current.liquidAssets)}</strong>
+                </div>
+                <div className={styles.tooltipRow}>
+                  <span>Total Liabilities:</span>
+                  <strong>{formatCurrency(current.totalLiabilities)}</strong>
+                </div>
+                <div className={styles.tooltipDivider} />
+                <div className={styles.tooltipRow}>
+                  <span>Formula:</span>
+                  <strong>Liquid ÷ Liabilities</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.miniCardIdeal} ${styles['status' + getLiquidityStatus(current.liquidityRatio)]}`}>
+              {getLiquidityStatus(current.liquidityRatio) === 'Good' ? 'Strong' : 'Weak'}
+            </div>
           </div>
 
+          {/* Aggregate LTV */}
           <div className={styles.miniCard}>
-            <div className={styles.miniCardTitle}>Aggregate LTV</div>
-            <div className={`${styles.miniCardValue} ${styles['status' + getLTVStatus(current.totalPropertyLTV)]}`}>
-              {formatPercent(current.totalPropertyLTV)}
+            <div className={styles.miniCardHeader}>
+              <div className={`${styles.iconWrapper} ${styles.iconYellow}`}>🏠</div>
+              <div className={styles.miniCardTitle}>Aggregate LTV</div>
             </div>
-            <div className={styles.miniCardIdeal}>Ideal &lt; 80%</div>
+
+            <div className={styles.tooltipContainer}>
+              <div className={`${styles.miniCardValue} ${styles['status' + getLTVStatus(current.totalPropertyLTV)]}`}>
+                {formatPercent(current.totalPropertyLTV)}
+              </div>
+
+              <div className={styles.tooltipBox}>
+                <div style={{ fontWeight: 600, marginBottom: '8px' }}>Calculation</div>
+                <div className={styles.tooltipRow}>
+                  <span>Real Estate Debt:</span>
+                  <strong>{formatCurrency(current.totalRealEstateDebt)}</strong>
+                </div>
+                <div className={styles.tooltipRow}>
+                  <span>Real Estate Value:</span>
+                  <strong>{formatCurrency(current.totalRealEstateValue)}</strong>
+                </div>
+                <div className={styles.tooltipDivider} />
+                <div className={styles.tooltipRow}>
+                  <span>Formula:</span>
+                  <strong>Debt ÷ Value</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${styles.miniCardIdeal} ${styles['status' + getLTVStatus(current.totalPropertyLTV)]}`}>
+              {getLTVStatus(current.totalPropertyLTV) === 'Good' ? 'Good' : 'High'}
+            </div>
           </div>
         </div>
 
@@ -234,16 +345,13 @@ export default function LendingHealthPage() {
           ) : (
             <div className={styles.chartContainer}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+                <BarChart data={chartData} margin={{ top: 30, right: 30, left: 0, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickMargin={10} />
-                  <YAxis unit="%" stroke="var(--text-muted)" fontSize={12} domain={[0, 100]} />
-                  <Tooltip 
-                    cursor={{fill: 'transparent'}}
-                    contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)', borderRadius: '8px' }}
-                    formatter={(value: number) => [`${value.toFixed(1)}%`, 'LTV']}
-                  />
+                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickMargin={10} axisLine={false} tickLine={false} />
+                  <YAxis unit="%" stroke="var(--text-muted)" fontSize={12} domain={[0, 100]} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: 'transparent' }} content={<CustomRechartsTooltip />} />
                   <Bar dataKey="ltv" radius={[6, 6, 0, 0]} maxBarSize={60}>
+                    <LabelList dataKey="ltv" position="top" formatter={(val: number) => val.toFixed(1) + '%'} style={{ fontWeight: 600 }} />
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
@@ -258,7 +366,7 @@ export default function LendingHealthPage() {
         <div className={styles.recommendationBanner}>
           <div className={styles.recommendationIcon}>💡</div>
           <div className={styles.recommendationText}>
-            <strong>Key Takeaway:</strong> {recommendation}
+            <strong>Key Takeaway</strong> &nbsp;&nbsp; {recommendation}
           </div>
         </div>
 

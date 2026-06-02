@@ -101,6 +101,8 @@ export async function GET() {
       leverageRatio,
       liquidityRatio,
       totalPropertyLTV,
+      totalRealEstateValue,
+      totalRealEstateDebt,
       healthScore: score,
       properties
     };
