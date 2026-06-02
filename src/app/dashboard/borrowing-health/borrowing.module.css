@@ -381,18 +381,21 @@
     grid-row: 2;
   }
   .recommendationBanner {
-    grid-column: 1 / -1;
-    grid-row: 3;
+    grid-column: 1 / span 2 !important;
+    grid-row: 3 !important;
   }
   .scorePanel, .chartPanel, .miniCard, .recommendationBanner {
     break-inside: avoid;
     page-break-inside: avoid;
     border: 1px solid #ddd !important;
-    background: transparent !important;
-    color: #000 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
   }
   .recommendationBanner {
     border-left: 6px solid var(--accent) !important;
+  }
+  .recommendationBanner * {
+    color: #000000 !important;
   }
   .metricsRow {
     grid-template-columns: repeat(3, 1fr);
