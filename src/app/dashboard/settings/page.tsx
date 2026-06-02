@@ -120,7 +120,7 @@ export default function SettingsPage() {
         ) : items.map(item => (
           <div key={item.id} className={styles.itemRow}>
             <span>{item.name}</span>
-            <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--color-liability-text)' }} onClick={() => handleDelete(type.startsWith('CUSTOM_CATEGORY') ? 'CUSTOM_CATEGORY' : type, item.id)}>×</button>
+            <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--color-liability-text)' }} onClick={() => handleDelete(type.startsWith('CUSTOM_CATEGORY') ? 'CUSTOM_CATEGORY' : (type as 'CATEGORY' | 'OWNER' | 'INSTITUTION'), item.id)}>×</button>
           </div>
         ))}
       </div>
