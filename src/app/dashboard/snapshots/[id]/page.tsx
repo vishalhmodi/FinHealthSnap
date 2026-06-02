@@ -338,10 +338,12 @@ export default function SnapshotPage() {
   );
 
   // Summary computations
-  const totalAccountAssets = quarter.balances.reduce(
-    (sum, b) => sum + (editing ? (editAmounts[b.accountId] ?? b.amount) : b.amount),
-    0
-  );
+  const totalAccountAssets = quarter.balances
+    .filter((b) => !b.account.isExcluded)
+    .reduce(
+      (sum, b) => sum + (editing ? (editAmounts[b.accountId] ?? b.amount) : b.amount),
+      0
+    );
   const items = editing ? editCustom : quarter.customItems;
   const totalCustomAssets = items.filter(c => c.itemType === 'ASSET').reduce((s, c) => s + c.amount, 0);
   const totalLiabilities = items.filter(c => c.itemType === 'LIABILITY').reduce((s, c) => s + c.amount, 0);
