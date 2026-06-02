@@ -220,18 +220,19 @@ export default function LendingHealthPage() {
               <div className={styles.ltvList}>
                 {current.properties.map(p => (
                   <div key={p.id} className={styles.ltvItem}>
-                  <div className={styles.ltvDetails}>
-                    <span className={styles.ltvName}>{p.name} ({p.detail})</span>
-                    <span className={styles.ltvAmounts}>
-                      Value: {formatCurrency(p.assetValue)} | Debt: {formatCurrency(p.linkedDebt)}
-                    </span>
+                    <div className={styles.ltvDetails}>
+                      <span className={styles.ltvName}>{p.name} ({p.detail})</span>
+                      <span className={styles.ltvAmounts}>
+                        Value: {formatCurrency(p.assetValue)} | Debt: {formatCurrency(p.linkedDebt)}
+                      </span>
+                    </div>
+                    <div className={`${styles.gaugeText} ${styles['status' + getLTVStatus(p.ltv)]}`} style={{ margin: 0, fontSize: '1.5rem' }}>
+                      {formatPercent(p.ltv)}
+                    </div>
                   </div>
-                  <div className={`${styles.gaugeText} ${styles['status' + getLTVStatus(p.ltv)]}`} style={{ margin: 0, fontSize: '1.5rem' }}>
-                    {formatPercent(p.ltv)}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
