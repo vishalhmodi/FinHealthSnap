@@ -27,7 +27,9 @@ fi
 
 # Load .env variables if the file exists
 if [ -f ".env" ]; then
-  export $(grep -v '^#' .env | xargs)
+  set -a
+  source .env
+  set +a
 fi
 
 if [ -z "$GOOGLE_DRIVE_RELEASE_PATH" ]; then

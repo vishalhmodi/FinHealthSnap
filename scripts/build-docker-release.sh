@@ -93,8 +93,9 @@ echo "=================================================="
 
 # Load .env variables if the file exists
 if [ -f ".env" ]; then
-  # Load env variables (ignore comments)
-  export $(grep -v '^#' .env | xargs)
+  set -a
+  source .env
+  set +a
 fi
 
 echo ""
