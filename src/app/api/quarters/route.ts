@@ -78,17 +78,39 @@ export async function POST(request: NextRequest) {
       where: { quarterId: carryFromQuarterId, userId: user.userId },
     });
     if (prevCustom.length > 0) {
-      await prisma.customAssetLiability.createMany({
-        data: prevCustom.map((c) => ({
-          userId: user.userId,
-          quarterId: quarter.id,
-          name: c.name,
-          detail: c.detail,
-          itemType: c.itemType,
-          amount: c.amount,
-          sortOrder: c.sortOrder,
-        })),
-      });
+      const assets = prevCustom.filter(c => c.itemType === 'ASSET');
+      const idMap = new Map<string, string>();
+      
+      for (const asset of assets) {
+        const newAsset = await prisma.customAssetLiability.create({
+          data: {
+            userId: user.userId,
+            quarterId: quarter.id,
+            name: asset.name,
+            detail: asset.detail,
+            itemType: asset.itemType,
+            amount: asset.amount,
+            sortOrder: asset.sortOrder,
+          }
+        });
+        idMap.set(asset.id, newAsset.id);
+      }
+
+      const liabilities = prevCustom.filter(c => c.itemType === 'LIABILITY');
+      for (const liab of liabilities) {
+        await prisma.customAssetLiability.create({
+          data: {
+            userId: user.userId,
+            quarterId: quarter.id,
+            name: liab.name,
+            detail: liab.detail,
+            itemType: liab.itemType,
+            amount: liab.amount,
+            sortOrder: liab.sortOrder,
+            linkedAssetId: liab.linkedAssetId ? idMap.get(liab.linkedAssetId) || null : null,
+          }
+        });
+      }
     }
   } else {
     // Start with blank balances: populate all active accounts with $0

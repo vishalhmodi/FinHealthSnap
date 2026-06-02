@@ -58,10 +58,11 @@ export async function GET() {
     }
 
     for (const c of q.customItems) {
+      const displayName = c.category ? `${c.name} - ${c.category}` : c.name;
       if (c.itemType === 'ASSET') {
-        nonLiquidMap[c.name] = (nonLiquidMap[c.name] ?? 0) + c.amount;
+        nonLiquidMap[displayName] = (nonLiquidMap[displayName] ?? 0) + c.amount;
       } else if (c.itemType === 'LIABILITY') {
-        liabilityMap[c.name] = (liabilityMap[c.name] ?? 0) + c.amount;
+        liabilityMap[displayName] = (liabilityMap[displayName] ?? 0) + c.amount;
       }
     }
 
@@ -83,13 +84,14 @@ export async function GET() {
 
     for (const c of q.customItems) {
       if (c.amount === 0) continue;
-      const key = `${c.name}::${c.itemType}`;
+      const displayName = c.category ? `${c.name} - ${c.category}` : c.name;
+      const key = `${displayName}::${c.itemType}`;
       
       const existing = itemsMap.get(key);
       if (existing) {
         existing.amount += c.amount;
       } else {
-        itemsMap.set(key, { name: c.name, type: c.itemType as 'ASSET' | 'LIABILITY', amount: c.amount });
+        itemsMap.set(key, { name: displayName, type: c.itemType as 'ASSET' | 'LIABILITY', amount: c.amount });
       }
     }
 

@@ -24,6 +24,7 @@ model User {
   owners       Owner[]
   accounts     Account[]
   customItems  CustomAssetLiability[]
+  customItemCategories CustomItemCategory[]
 }
 
 // 2. Quarterly Snapshot Metadata
@@ -124,7 +125,24 @@ model CustomAssetLiability {
   name      String   // e.g. "Primary House", "Invest. House-1", "Heloc"
   detail    String   // e.g. "Equity", "Mortgage", "PrimaryHouse"
   itemType  String   // "ASSET" or "LIABILITY"
+  category  String?  // e.g. "Real Estate", "Mortgage", "HELOC"
   amount    Float    // Always positive; sign determined by itemType
   sortOrder Int      @default(0)
   updatedAt DateTime @updatedAt
+
+  linkedAssetId String?
+  linkedAsset   CustomAssetLiability?  @relation("LinkedAsset", fields: [linkedAssetId], references: [id])
+  linkedLiabilities CustomAssetLiability[] @relation("LinkedAsset")
+}
+
+// 9. Custom Item Categories (Assets & Liabilities Types)
+model CustomItemCategory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   // e.g. "Real Estate", "Mortgage"
+  type      String   // "ASSET" or "LIABILITY"
+  createdAt DateTime @default(now())
+
+  @@unique([userId, name, type])
 }

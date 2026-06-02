@@ -29,6 +29,8 @@ interface CustomItem {
   itemType: string;
   amount: number;
   sortOrder: number;
+  linkedAssetId?: string;
+  category?: string | null;
 }
 
 interface QuarterData {
@@ -161,7 +163,12 @@ export default function SnapshotPage() {
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [newAccountData, setNewAccountData] = useState({ categoryName: '', ownerName: '', institutionName: '' });
   const [addingAccount, setAddingAccount] = useState(false);
-  const [presets, setPresets] = useState<{ categories: Category[], owners: Owner[], institutions: Institution[] }>({ categories: [], owners: [], institutions: [] });
+  const [presets, setPresets] = useState<{ 
+    categories: Category[], 
+    owners: Owner[], 
+    institutions: Institution[],
+    customCategories: {id: string, name: string, type: string}[]
+  }>({ categories: [], owners: [], institutions: [], customCategories: [] });
 
   const loadData = useCallback(() => {
     Promise.all([
@@ -172,7 +179,8 @@ export default function SnapshotPage() {
       setPresets({
         categories: accountsData.categories || [],
         owners: accountsData.owners || [],
-        institutions: accountsData.institutions || []
+        institutions: accountsData.institutions || [],
+        customCategories: accountsData.customItemCategories || []
       });
       if (accountsData.categories?.length && accountsData.owners?.length && accountsData.institutions?.length) {
         setNewAccountData({
@@ -196,7 +204,7 @@ export default function SnapshotPage() {
     setEditAmounts((prev) => ({ ...prev, [accountId]: val }));
   }
 
-  function handleCustomChange(idx: number, field: 'amount' | 'name' | 'detail' | 'itemType', value: string | number) {
+  function handleCustomChange(idx: number, field: keyof CustomItem, value: any) {
     setEditCustom((prev) => prev.map((c, i) => i === idx ? { ...c, [field]: value } : c));
   }
 
@@ -468,6 +476,24 @@ export default function SnapshotPage() {
                         <option value="ASSET">Asset</option>
                         <option value="LIABILITY">Liability</option>
                       </select>
+                      <select
+                        className="form-input"
+                        value={item.category || ''}
+                        onChange={(e) => handleCustomChange(idx, 'category', e.target.value)}
+                        id={`custom-category-${idx}`}
+                        style={{ minWidth: 140 }}
+                      >
+                        <option value="">-- Kind --</option>
+                        {item.itemType === 'ASSET' ? (
+                          presets.customCategories.filter(c => c.type === 'ASSET').map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))
+                        ) : (
+                          presets.customCategories.filter(c => c.type === 'LIABILITY').map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))
+                        )}
+                      </select>
                       <input
                         type="number"
                         className={`form-input form-input-currency ${styles.customAmtInput}`}
@@ -483,12 +509,33 @@ export default function SnapshotPage() {
                         onClick={() => removeCustomItem(idx)}
                         title="Remove Item"
                       >×</button>
+                      {item.itemType === 'LIABILITY' && (
+                        <select
+                          className="form-input"
+                          value={item.linkedAssetId || ''}
+                          onChange={(e) => handleCustomChange(idx, 'linkedAssetId', e.target.value || undefined)}
+                          style={{ minWidth: '100%', marginTop: '4px', fontSize: '0.8rem', padding: '4px' }}
+                        >
+                          <option value="">-- No Linked Asset --</option>
+                          {items.filter(i => i.itemType === 'ASSET' && i.id).map(i => (
+                            <option key={i.id} value={i.id}>Links to: {i.name} ({i.detail})</option>
+                          ))}
+                        </select>
+                      )}
                     </div>
                   ) : (
                     <div className={styles.customViewRow}>
                       <div className={styles.customItemMeta}>
-                        <span className={styles.customItemName}>{item.name}</span>
+                        <span className={styles.customItemName}>
+                          {item.name} 
+                          {item.category && <span style={{ fontSize: '0.7em', padding: '2px 6px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', marginLeft: '6px' }}>{item.category}</span>}
+                        </span>
                         <span className={styles.customItemDetail}>{item.detail}</span>
+                        {item.linkedAssetId && item.itemType === 'LIABILITY' && (
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-liability-text)', display: 'block', marginTop: '2px' }}>
+                            ↳ Linked to: {items.find(i => i.id === item.linkedAssetId)?.name || 'Unknown Asset'}
+                          </span>
+                        )}
                       </div>
                       <span className={`font-mono ${item.itemType === 'ASSET' ? 'amount-positive' : 'amount-negative'}`}>
                         {item.itemType === 'LIABILITY' ? '-' : ''}{formatCurrency(item.amount)}

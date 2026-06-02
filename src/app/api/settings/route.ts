@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
       result = await prisma.owner.create({ data: { name, userId: user.userId } });
     } else if (type === 'INSTITUTION') {
       result = await prisma.institution.create({ data: { name, userId: user.userId } });
+    } else if (type === 'CUSTOM_CATEGORY_ASSET') {
+      result = await prisma.customItemCategory.create({ data: { name, type: 'ASSET', userId: user.userId } });
+    } else if (type === 'CUSTOM_CATEGORY_LIABILITY') {
+      result = await prisma.customItemCategory.create({ data: { name, type: 'LIABILITY', userId: user.userId } });
     } else {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }

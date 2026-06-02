@@ -1,0 +1,381 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1200px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pageHeader h1 {
+  margin-bottom: 4px;
+}
+
+.pageHeader p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  grid-template-rows: auto auto;
+  gap: 24px;
+}
+
+/* LEFT PANEL - OVERALL SCORE */
+.scorePanel {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.scorePanel::before,
+.chartPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0.7;
+}
+
+
+
+.scorePanel h2 {
+  font-size: 1.25rem;
+  margin-bottom: 32px;
+  font-weight: 600;
+}
+
+.circularScore {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scoreCircleSvg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+.scoreBg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 16;
+}
+
+/* Fallback for light mode if the card isn't explicitly dark */
+:root .scoreBg {
+  stroke: var(--border-color);
+}
+.scorePanelDark .scoreBg {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.scoreFill {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-out, stroke 1s ease;
+}
+
+.scoreTextContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.scoreValue {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  font-family: var(--font-mono);
+  /* Color will be injected inline based on score */
+}
+
+.scoreLabel {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.scoreSubtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 24px;
+  line-height: 1.5;
+}
+
+/* TOP RIGHT - METRICS ROW */
+.metricsRow {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.miniCard {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible; /* changed for tooltips */
+}
+
+.miniCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0.7;
+}
+
+.miniCard.borderOrange::before { background: linear-gradient(90deg, transparent, var(--color-warning), transparent); }
+.miniCard.borderGreen::before { background: linear-gradient(90deg, transparent, var(--color-asset), transparent); }
+.miniCard.borderYellow::before { background: linear-gradient(90deg, transparent, #eab308, transparent); }
+.miniCard.borderRed::before { background: linear-gradient(90deg, transparent, var(--color-liability), transparent); }
+
+.miniCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.iconOrange { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.iconGreen { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.iconYellow { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+
+.miniCardTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.miniCardValue {
+  font-size: clamp(1.8rem, 2vw, 2.25rem);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  margin-bottom: 4px;
+  display: inline-block;
+}
+
+.miniCardValue.colorOrange { color: var(--color-warning); text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+.miniCardValue.colorGreen { color: var(--color-asset); text-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+.miniCardValue.colorBlue { color: var(--color-secondary); text-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
+.miniCardValue.colorRed { color: var(--color-liability); text-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+
+.miniCardDesc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.miniCardIdeal {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* TOOLTIPS */
+.tooltipContainer {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.tooltipBox {
+  visibility: hidden;
+  position: absolute;
+  z-index: 100;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background-color: var(--bg-surface);
+  color: var(--text-color);
+  text-align: left;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  width: max-content;
+  max-width: 250px;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  font-size: 0.85rem;
+  font-weight: normal;
+  pointer-events: none;
+}
+
+/* Make tooltips visibly robust to themes */
+@media (prefers-color-scheme: dark) {
+  .tooltipBox {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+  }
+}
+@media (prefers-color-scheme: light) {
+  .tooltipBox {
+    background-color: #ffffff;
+    border-color: #cbd5e1;
+    color: #0f172a;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+}
+
+.tooltipContainer:hover .tooltipBox {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  gap: 16px;
+}
+
+.tooltipDivider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 8px 0;
+}
+
+/* BOTTOM RIGHT - CHART PANEL */
+.chartPanel {
+  grid-column: 2;
+  grid-row: 2;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.chartPanel h2 {
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.chartContainer {
+  width: 100%;
+  height: 350px;
+  min-height: 350px;
+  flex: 1;
+}
+
+/* RECOMMENDATION BANNER */
+.recommendationBanner {
+  grid-column: 1 / -1;
+  padding: 20px 24px;
+  background: var(--bg-surface);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--border-color);
+  border-left: 6px solid var(--accent);
+}
+
+.recommendationIcon {
+  font-size: 1.5rem;
+}
+
+.recommendationText {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* UTILITIES */
+.statusGood { color: #10b981; }
+.statusWarn { color: #f59e0b; }
+.statusDanger { color: #ef4444; }
+
+.strokeGood { stroke: #10b981; }
+.strokeWarn { stroke: #f59e0b; }
+.strokeDanger { stroke: #ef4444; }
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: var(--text-muted);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+  .scorePanel, .metricsRow, .chartPanel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .metricsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .scorePanel {
+    padding: 20px;
+    box-shadow: none !important;
+  }
+  .scorePanel, .chartPanel, .miniCard {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ddd !important;
+  }
+  .metricsRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -12,9 +12,10 @@ interface Props {
 }
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '◈' },
+  { href: '/dashboard', label: 'Dashboard', icon: '◱' },
   { href: '/dashboard/snapshots', label: 'Snapshots', icon: '◫' },
-  { href: '/dashboard/settings', label: 'Settings', icon: '◎' },
+  { href: '/dashboard/lending-health', label: 'Lending Health', icon: '◎' },
+  { href: '/dashboard/settings', label: 'Settings', icon: '⚙' },
 ];
 
 export default function AppShell({ user, children }: Props) {
