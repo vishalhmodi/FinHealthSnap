@@ -112,7 +112,7 @@ export async function GET() {
 
   return NextResponse.json({ trends, latest });
   } catch (error: any) {
-    console.error('Lending Health API Error:', error);
+    console.error('Borrowing Health API Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, LabelList } from 'recharts';
-import styles from './lending.module.css';
+import styles from './borrowing.module.css';
 import { formatCurrency, formatPercent } from '@/lib/utils';
 
 interface Property {
@@ -60,14 +60,14 @@ const CustomRechartsTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function LendingHealthPage() {
+export default function BorrowingHealthPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedQuarterId, setSelectedQuarterId] = useState<string | null>(null);
   const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
-    fetch('/api/lending-health')
+    fetch('/api/borrowing-health')
       .then(async (r) => {
         if (!r.ok) {
           const text = await r.text();
@@ -77,7 +77,7 @@ export default function LendingHealthPage() {
       })
       .then(setData)
       .catch((err) => {
-        console.error('Failed to load lending health data:', err);
+        console.error('Failed to load borrowing health data:', err);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -103,7 +103,7 @@ export default function LendingHealthPage() {
     return (
       <div className={styles.loading}>
         <div className="spinner" />
-        <p>Analyzing lending health metrics…</p>
+        <p>Analyzing borrowing health metrics…</p>
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function LendingHealthPage() {
       <div className={styles.page}>
         <div className={styles.pageHeader}>
           <div>
-            <h1>Lending Health Dashboard</h1>
+            <h1>Borrowing Health Dashboard</h1>
             <p>No data yet — add your first quarter</p>
           </div>
         </div>
@@ -164,9 +164,9 @@ export default function LendingHealthPage() {
   const circleCircumference = 2 * Math.PI * circleRadius;
   const strokeDashoffset = circleCircumference - (animatedScore / 100) * circleCircumference;
 
-  let recommendation = "You're in a good position for lending opportunities.";
+  let recommendation = "You're in a good position for borrowing opportunities.";
   if (current.healthScore < 60) {
-    recommendation = "Your overall profile needs improvement before seeking major lending.";
+    recommendation = "Your overall profile needs improvement before seeking major borrowing.";
   } else {
     if (current.totalPropertyLTV > 0.8) recommendation = "Consider lowering your property LTV to avoid mortgage insurance and get better rates.";
     else if (current.liquidityRatio < 0.5) recommendation = "Maintain liquidity and consider lowering debt to strengthen your profile.";
@@ -185,7 +185,7 @@ export default function LendingHealthPage() {
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <div>
-          <h1>Lending Health Dashboard</h1>
+          <h1>Borrowing Health Dashboard</h1>
           <p>A visual summary of your financial position.</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -243,7 +243,7 @@ export default function LendingHealthPage() {
             {scoreData.label}
           </div>
           <p className={styles.scoreSubtext} style={{ marginTop: '24px' }}>
-            You're in a {scoreData.label.toLowerCase()} position for<br/>lending opportunities.
+            You're in a {scoreData.label.toLowerCase()} position for<br/>borrowing opportunities.
           </p>
         </div>
 
@@ -323,7 +323,7 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={styles.miniCardDesc}>
-              Measures your ability to cover debts with easily accessible cash. Levels: <strong>Strong (&gt;100%)</strong>, <strong>Moderate (50-100%)</strong>, <strong>Weak (&lt;50%)</strong>. Over 100% is ideal for lending safety.
+              Measures your ability to cover debts with easily accessible cash. Levels: <strong>Strong (&gt;100%)</strong>, <strong>Moderate (50-100%)</strong>, <strong>Weak (&lt;50%)</strong>. Over 100% is ideal for borrowing safety.
             </div>
           </div>
 
