@@ -65,6 +65,10 @@ export async function GET() {
       })
       .filter(p => p.linkedDebt > 0); // Only include properties with linked debt
 
+    const totalRealEstateValue = properties.reduce((sum, p) => sum + p.assetValue, 0);
+    const totalRealEstateDebt = properties.reduce((sum, p) => sum + p.linkedDebt, 0);
+    const totalPropertyLTV = totalRealEstateValue > 0 ? totalRealEstateDebt / totalRealEstateValue : 0;
+
     return {
       quarterId: q.id,
       label: q.label,
@@ -74,6 +78,7 @@ export async function GET() {
       netWorth,
       leverageRatio,
       liquidityRatio,
+      totalPropertyLTV,
       properties
     };
   });

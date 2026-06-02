@@ -22,6 +22,7 @@ interface TrendData {
   netWorth: number;
   leverageRatio: number;
   liquidityRatio: number;
+  totalPropertyLTV: number;
   properties: Property[];
 }
 
@@ -199,9 +200,26 @@ export default function LendingHealthPage() {
               No linked properties found. To see LTV, go to Snapshots and link your Mortgage (Liability) to your House (Asset).
             </div>
           ) : (
-            <div className={styles.ltvList}>
-              {current.properties.map(p => (
-                <div key={p.id} className={styles.ltvItem}>
+            <>
+              {/* Aggregate Total LTV */}
+              <div className={styles.gaugeContainer} style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--text-muted)' }}>Aggregate Portfolio LTV</h3>
+                <div className={styles.gaugeBar} style={{ height: '16px' }}>
+                  <div 
+                    className={`${styles.gaugeFill} ${styles['bg' + getLTVStatus(current.totalPropertyLTV)]}`} 
+                    style={{ width: `${Math.min(current.totalPropertyLTV * 100, 100)}%` }} 
+                  />
+                </div>
+                <div className={`${styles.gaugeText} ${styles['status' + getLTVStatus(current.totalPropertyLTV)]}`} style={{ fontSize: '1.25rem', marginTop: '8px' }}>
+                  {formatPercent(current.totalPropertyLTV)}
+                </div>
+              </div>
+              
+              {/* Individual Property breakdown */}
+              <h3 style={{ fontSize: '0.9rem', marginBottom: '12px', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>Individual Properties</h3>
+              <div className={styles.ltvList}>
+                {current.properties.map(p => (
+                  <div key={p.id} className={styles.ltvItem}>
                   <div className={styles.ltvDetails}>
                     <span className={styles.ltvName}>{p.name} ({p.detail})</span>
                     <span className={styles.ltvAmounts}>
