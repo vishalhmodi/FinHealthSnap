@@ -32,7 +32,9 @@ export async function GET() {
   const trends = sorted.map((label) => {
     const q = quarters.find((x) => x.label === label)!;
 
-    const liquidAssets = q.balances.reduce((sum, b) => sum + b.amount, 0);
+    const liquidAssets = q.balances
+      .filter((b) => !b.account.isExcluded)
+      .reduce((sum, b) => sum + b.amount, 0);
     const nonLiquidAssets = q.customItems
       .filter((c) => c.itemType === 'ASSET')
       .reduce((sum, c) => sum + c.amount, 0);
@@ -112,7 +114,7 @@ export async function GET() {
 
   return NextResponse.json({ trends, latest });
   } catch (error: any) {
-    console.error('Lending Health API Error:', error);
+    console.error('Borrowing Health API Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

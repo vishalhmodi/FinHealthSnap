@@ -14,6 +14,7 @@ interface AccountEntry {
   category: Category;
   institution: Institution;
   owner: Owner;
+  isExcluded: boolean;
 }
 
 interface Balance {
@@ -49,7 +50,8 @@ function buildCategoryGrid(
   editAmounts: Record<string, number>,
   editing: boolean,
   onAmountChange: (accountId: string, val: number) => void,
-  onDeleteAccount: (accountId: string) => void
+  onDeleteAccount: (accountId: string) => void,
+  onToggleExclude: (accountId: string, currentStatus: boolean) => void
 ) {
   const catBalances = balances.filter((b) => b.account.category.name === categoryName);
   if (catBalances.length === 0) return null;
@@ -62,14 +64,14 @@ function buildCategoryGrid(
   const ownerTotals: Record<string, number> = {};
   for (const o of owners) {
     ownerTotals[o.id] = catBalances
-      .filter((b) => b.account.owner.id === o.id)
+      .filter((b) => b.account.owner.id === o.id && !b.account.isExcluded)
       .reduce((sum, b) => sum + (editAmounts[b.accountId] ?? b.amount), 0);
   }
   // Institution totals
   const institutionTotals: Record<string, number> = {};
   for (const inst of institutions) {
     institutionTotals[inst.id] = catBalances
-      .filter((b) => b.account.institution.id === inst.id)
+      .filter((b) => b.account.institution.id === inst.id && !b.account.isExcluded)
       .reduce((sum, b) => sum + (editAmounts[b.accountId] ?? b.amount), 0);
   }
 
@@ -99,6 +101,7 @@ function buildCategoryGrid(
       {owners.map((owner) => {
         const ownerRowTotal = institutions.reduce((sum, inst) => {
           const bal = catBalances.find((b) => b.account.owner.id === owner.id && b.account.institution.id === inst.id);
+          if (bal && bal.account.isExcluded) return sum;
           return sum + (bal ? (editAmounts[bal.accountId] ?? bal.amount) : 0);
         }, 0);
 
@@ -113,7 +116,7 @@ function buildCategoryGrid(
               return (
                 <div key={inst.id} className={styles.catCell}>
                   {editing && bal ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', opacity: bal.account.isExcluded ? 0.5 : 1 }}>
                       <input
                         type="number"
                         className={`form-input form-input-currency ${styles.balanceInput}`}
@@ -124,6 +127,14 @@ function buildCategoryGrid(
                         id={`balance-${bal.accountId}`}
                       />
                       <button 
+                        type="button"
+                        className="btn btn-ghost btn-sm" 
+                        style={{ padding: '0 4px', color: 'var(--text-muted)' }} 
+                        title={bal.account.isExcluded ? "Include Account" : "Exclude Account"} 
+                        onClick={() => onToggleExclude(bal.accountId, bal.account.isExcluded)}
+                      >{bal.account.isExcluded ? '👁️' : '🚫'}</button>
+                      <button 
+                        type="button"
                         className="btn btn-ghost btn-sm" 
                         style={{ padding: '0 4px', color: 'var(--color-liability-text)' }} 
                         title="Delete Account Globally" 
@@ -131,7 +142,7 @@ function buildCategoryGrid(
                       >×</button>
                     </div>
                   ) : (
-                    <span className="font-mono">{bal ? formatCurrency(val) : '-'}</span>
+                    <span className="font-mono" style={{ textDecoration: bal?.account.isExcluded ? 'line-through' : 'none', opacity: bal?.account.isExcluded ? 0.5 : 1 }}>{bal ? formatCurrency(val) : '-'}</span>
                   )}
                 </div>
               );
@@ -237,6 +248,24 @@ export default function SnapshotPage() {
     setSaving(false);
   }
 
+  async function handleToggleExcludeAccount(accountId: string, currentStatus: boolean) {
+    try {
+      const res = await fetch(`/api/accounts/${accountId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isExcluded: !currentStatus })
+      });
+      if (!res.ok) throw new Error('Failed to toggle exclusion');
+      
+      // Update local state by forcing a reload or updating manually. 
+      // Reload is safer since it ensures everything recalculates cleanly.
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update account exclusion status.');
+    }
+  }
+
   async function handleDeleteQuarter() {
     if (!confirm('Are you sure you want to delete this entire snapshot?')) return;
     setSaving(true);
@@ -309,10 +338,12 @@ export default function SnapshotPage() {
   );
 
   // Summary computations
-  const totalAccountAssets = quarter.balances.reduce(
-    (sum, b) => sum + (editing ? (editAmounts[b.accountId] ?? b.amount) : b.amount),
-    0
-  );
+  const totalAccountAssets = quarter.balances
+    .filter((b) => !b.account.isExcluded)
+    .reduce(
+      (sum, b) => sum + (editing ? (editAmounts[b.accountId] ?? b.amount) : b.amount),
+      0
+    );
   const items = editing ? editCustom : quarter.customItems;
   const totalCustomAssets = items.filter(c => c.itemType === 'ASSET').reduce((s, c) => s + c.amount, 0);
   const totalLiabilities = items.filter(c => c.itemType === 'LIABILITY').reduce((s, c) => s + c.amount, 0);
@@ -407,7 +438,7 @@ export default function SnapshotPage() {
           {categories.map((cat) => (
             <div key={cat} className={`glass-card ${styles.catCard}`}>
               <div className={styles.catCardHeader}>{cat}</div>
-              {buildCategoryGrid(quarter.balances, cat, editAmounts, editing, handleAmountChange, handleDeleteAccount)}
+              {buildCategoryGrid(quarter.balances, cat, editAmounts, editing, handleAmountChange, handleDeleteAccount, handleToggleExcludeAccount)}
             </div>
           ))}
         </div>

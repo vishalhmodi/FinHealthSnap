@@ -80,6 +80,6 @@ Use this account to log in (created in Step 6):
 If you previously set up the application and have downloaded the latest code from GitHub to update your existing setup, you must ensure your database schema is upgraded.
 To easily upgrade the database, open Command Prompt, navigate to your project folder, and run the included batch script:
 ```cmd
-releases\update-db-add-category.bat
+releases\update-db-schema.bat
 ```
 This script will safely migrate your local `dev.db` schema to support the newest features without data loss.

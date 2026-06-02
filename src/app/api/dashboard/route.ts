@@ -28,7 +28,9 @@ export async function GET() {
   const trends = sorted.map((label) => {
     const q = quarters.find((x) => x.label === label)!;
 
-    const accountAssets = q.balances.reduce((sum, b) => sum + b.amount, 0);
+    const accountAssets = q.balances
+      .filter((b) => !b.account.isExcluded)
+      .reduce((sum, b) => sum + b.amount, 0);
     const customAssets = q.customItems
       .filter((c) => c.itemType === 'ASSET')
       .reduce((sum, c) => sum + c.amount, 0);
@@ -47,6 +49,8 @@ export async function GET() {
     const liabilityMap: Record<string, number> = {};
 
     for (const b of q.balances) {
+      if (b.account.isExcluded) continue;
+      
       const cat = b.account.category.name;
       categoryMap[cat] = (categoryMap[cat] ?? 0) + b.amount;
 
@@ -70,7 +74,7 @@ export async function GET() {
     const itemsMap = new Map<string, { name: string; type: 'ASSET' | 'LIABILITY'; amount: number }>();
 
     for (const b of q.balances) {
-      if (b.amount === 0) continue;
+      if (b.amount === 0 || b.account.isExcluded) continue;
       const name = `${b.account.category.name} - ${b.account.owner.name}`;
       const key = `${name}::ASSET`;
       

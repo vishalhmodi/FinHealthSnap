@@ -42,7 +42,7 @@ If you received an existing `dev.db` file containing old data:
 If you are upgrading from an older version of FinHealthSnap and brought over your old `dev.db` file, you must update the database schema to support new features.
 In your Terminal (inside the `FinHealthSnap_App` folder), run:
 ```bash
-./update-db-add-category.sh
+./update-db-schema.sh
 ```
 *(Note: If you are starting fresh with Option A, you can skip this step.)*
 

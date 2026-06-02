@@ -75,8 +75,8 @@ echo ""
 echo "-> Copying Setup Instructions"
 cp docs/Application-Setup_mac.pdf "${RELEASE_DIR}/"
 cp docs/Application-Setup_windows.pdf "${RELEASE_DIR}/"
-cp releases/update-db-add-category.sh "${RELEASE_DIR}/" 2>/dev/null || true
-cp releases/update-db-add-category.bat "${RELEASE_DIR}/" 2>/dev/null || true
+cp releases/update-db-schema.sh "${RELEASE_DIR}/" 2>/dev/null || true
+cp releases/update-db-schema.bat "${RELEASE_DIR}/" 2>/dev/null || true
 
 echo ""
 echo "-> Creating ZIP archive"

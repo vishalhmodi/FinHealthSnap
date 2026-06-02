@@ -97,6 +97,7 @@ model Account {
   owner         Owner           @relation(fields: [ownerId], references: [id])
   name          String?
   isActive      Boolean         @default(true)
+  isExcluded    Boolean         @default(false)
   createdAt     DateTime        @default(now())
 
   balances AccountBalance[]

@@ -44,7 +44,7 @@ If you received an existing `dev.db` file containing old data:
 If you are upgrading from an older version of FinHealthSnap and brought over your old `dev.db` file, you must update the database schema to support new features.
 In your PowerShell/Command Prompt window (inside the `FinHealthSnap_App` folder), run:
 ```cmd
-.\update-db-add-category.bat
+.\update-db-schema.bat
 ```
 *(Note: If you are starting fresh with Option A, you can skip this step.)*
 

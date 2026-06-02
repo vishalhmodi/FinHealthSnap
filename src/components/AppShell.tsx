@@ -14,7 +14,7 @@ interface Props {
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '◱' },
   { href: '/dashboard/snapshots', label: 'Snapshots', icon: '◫' },
-  { href: '/dashboard/lending-health', label: 'Lending Health', icon: '◎' },
+  { href: '/dashboard/borrowing-health', label: 'Borrowing Health', icon: '◎' },
   { href: '/dashboard/settings', label: 'Settings', icon: '⚙' },
 ];
 
