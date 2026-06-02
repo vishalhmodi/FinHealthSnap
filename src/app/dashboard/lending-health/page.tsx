@@ -200,29 +200,39 @@ export default function LendingHealthPage() {
         <div className={`${styles.scorePanel} ${styles.scorePanelDark}`}>
           <h2>Overall Health Score</h2>
           <div className={styles.circularScore}>
-            <svg className={styles.scoreCircleSvg} viewBox="0 0 200 200">
-              {/* Semi-circle path (arc) instead of full circle */}
+            <svg className={styles.scoreCircleSvg} viewBox="0 0 200 120">
+              <defs>
+                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="50%" stopColor="#eab308" />
+                  <stop offset="100%" stopColor="#ea580c" />
+                </linearGradient>
+              </defs>
+              {/* Semi-circle background path */}
               <path 
                 className={styles.scoreBg} 
                 d="M 20 100 A 80 80 0 0 1 180 100" 
                 strokeLinecap="round"
               />
+              {/* Colored fill path matching score */}
               <path 
-                className={`${styles.scoreFill} ${styles['stroke' + scoreData.cls]}`}
+                className={styles.scoreFill}
                 d="M 20 100 A 80 80 0 0 1 180 100"
+                stroke="url(#scoreGradient)"
+                strokeLinecap="round"
                 strokeDasharray={251.2} /* PI * 80 */
                 strokeDashoffset={251.2 - (animatedScore / 100) * 251.2}
               />
             </svg>
-            <div className={styles.scoreTextContainer} style={{ transform: 'translateY(-10px)' }}>
+            <div className={styles.scoreTextContainer} style={{ position: 'absolute', bottom: '0', width: '100%', textAlign: 'center' }}>
               <div className={styles.scoreValue}>{current.healthScore}</div>
               <div style={{ fontSize: '1rem', color: '#94a3b8' }}>/100</div>
             </div>
           </div>
-          <div className={`${styles.scoreLabel} ${styles['status' + scoreData.cls]}`} style={{ marginTop: '-40px' }}>
+          <div className={`${styles.scoreLabel} ${styles['status' + scoreData.cls]}`} style={{ marginTop: '16px' }}>
             {scoreData.label}
           </div>
-          <p className={styles.scoreSubtext} style={{ marginTop: '40px' }}>
+          <p className={styles.scoreSubtext} style={{ marginTop: '24px' }}>
             You're in a {scoreData.label.toLowerCase()} position for<br/>lending opportunities.
           </p>
         </div>
