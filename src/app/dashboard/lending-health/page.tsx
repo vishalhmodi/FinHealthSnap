@@ -234,14 +234,14 @@ export default function LendingHealthPage() {
         {/* TOP RIGHT: CORE METRICS ROW */}
         <div className={styles.metricsRow}>
           {/* Debt-to-Asset Ratio */}
-          <div className={`${styles.miniCard} glass-card`}>
+          <div className={`${styles.miniCard} ${styles.borderOrange} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconOrange}`}>📊</div>
               <div className={styles.miniCardTitle}>Debt-to-Asset Ratio</div>
             </div>
             
             <div className={styles.tooltipContainer}>
-              <div className={styles.miniCardValue}>
+              <div className={`${styles.miniCardValue} ${styles.colorOrange}`}>
                 {formatPercent(current.leverageRatio)}
               </div>
               
@@ -269,14 +269,14 @@ export default function LendingHealthPage() {
           </div>
 
           {/* Liquidity to Debt Ratio */}
-          <div className={`${styles.miniCard} glass-card`}>
+          <div className={`${styles.miniCard} ${styles.borderGreen} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconGreen}`}>💧</div>
               <div className={styles.miniCardTitle}>Liquidity to Debt Ratio</div>
             </div>
 
             <div className={styles.tooltipContainer}>
-              <div className={styles.miniCardValue}>
+              <div className={`${styles.miniCardValue} ${styles.colorBlue}`}>
                 {formatPercent(current.liquidityRatio)}
               </div>
 
@@ -304,14 +304,14 @@ export default function LendingHealthPage() {
           </div>
 
           {/* Aggregate LTV */}
-          <div className={`${styles.miniCard} glass-card`}>
+          <div className={`${styles.miniCard} ${styles.borderYellow} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconYellow}`}>🏠</div>
               <div className={styles.miniCardTitle}>Aggregate LTV</div>
             </div>
 
             <div className={styles.tooltipContainer}>
-              <div className={styles.miniCardValue}>
+              <div className={`${styles.miniCardValue} ${styles.colorGreen}`}>
                 {formatPercent(current.totalPropertyLTV)}
               </div>
 

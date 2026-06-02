@@ -93,10 +93,12 @@
 }
 
 .scoreValue {
-  font-size: 4rem;
-  font-weight: 800;
+  font-size: 4.5rem;
+  font-weight: 700;
   line-height: 1;
   font-family: var(--font-mono);
+  color: #f8fafc;
+  text-shadow: 0 0 20px rgba(255,255,255,0.1);
 }
 
 .scoreLabel {
@@ -129,6 +131,21 @@
   overflow: visible; /* changed for tooltips */
 }
 
+.miniCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0.7;
+}
+
+.miniCard.borderOrange::before { background: linear-gradient(90deg, transparent, var(--color-warning), transparent); }
+.miniCard.borderGreen::before { background: linear-gradient(90deg, transparent, var(--color-asset), transparent); }
+.miniCard.borderYellow::before { background: linear-gradient(90deg, transparent, #eab308, transparent); }
+
 .miniCardHeader {
   display: flex;
   align-items: center;
@@ -151,18 +168,24 @@
 .iconYellow { background: rgba(234, 179, 8, 0.1); color: #eab308; }
 
 .miniCardTitle {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .miniCardValue {
-  font-size: 2.25rem;
+  font-size: clamp(1.8rem, 2vw, 2.25rem);
   font-weight: 700;
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   margin-bottom: 4px;
   display: inline-block;
 }
+
+.miniCardValue.colorOrange { color: var(--color-warning); text-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+.miniCardValue.colorGreen { color: var(--color-asset); text-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+.miniCardValue.colorBlue { color: var(--color-secondary); text-shadow: 0 0 10px rgba(6, 182, 212, 0.2); }
 
 .miniCardIdeal {
   font-size: 0.85rem;
