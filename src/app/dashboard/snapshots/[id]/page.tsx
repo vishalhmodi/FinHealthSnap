@@ -204,7 +204,7 @@ export default function SnapshotPage() {
     setEditAmounts((prev) => ({ ...prev, [accountId]: val }));
   }
 
-  function handleCustomChange(idx: number, field: 'amount' | 'name' | 'detail' | 'itemType', value: string | number) {
+  function handleCustomChange(idx: number, field: keyof CustomItem, value: any) {
     setEditCustom((prev) => prev.map((c, i) => i === idx ? { ...c, [field]: value } : c));
   }
 
