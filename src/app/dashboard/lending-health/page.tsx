@@ -211,20 +211,14 @@ export default function LendingHealthPage() {
               {/* Semi-circle background path */}
               <path 
                 className={styles.scoreBg} 
-                d="M 20 100 A 80 80 0 0 1 180 100" 
-                strokeLinecap="round"
-              />
-              {/* Colored fill path matching score */}
-              <path 
-                className={styles.scoreFill}
-                d="M 20 100 A 80 80 0 0 1 180 100"
+                d="M 30 100 A 70 70 0 0 1 170 100" 
                 stroke="url(#scoreGradient)"
+                strokeWidth="24"
                 strokeLinecap="round"
-                strokeDasharray={251.2} /* PI * 80 */
-                strokeDashoffset={251.2 - (animatedScore / 100) * 251.2}
+                fill="none"
               />
             </svg>
-            <div className={styles.scoreTextContainer} style={{ position: 'absolute', bottom: '0', width: '100%', textAlign: 'center' }}>
+            <div className={styles.scoreTextContainer} style={{ position: 'absolute', bottom: '10px', width: '100%', textAlign: 'center' }}>
               <div className={styles.scoreValue}>{current.healthScore}</div>
               <div style={{ fontSize: '1rem', color: '#94a3b8' }}>/100</div>
             </div>
@@ -247,7 +241,7 @@ export default function LendingHealthPage() {
             </div>
             
             <div className={styles.tooltipContainer}>
-              <div className={`${styles.miniCardValue} ${styles['status' + getLeverageStatus(current.leverageRatio)]}`}>
+              <div className={styles.miniCardValue}>
                 {formatPercent(current.leverageRatio)}
               </div>
               
@@ -282,7 +276,7 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={styles.tooltipContainer}>
-              <div className={`${styles.miniCardValue} ${styles['status' + getLiquidityStatus(current.liquidityRatio)]}`}>
+              <div className={styles.miniCardValue}>
                 {formatPercent(current.liquidityRatio)}
               </div>
 
@@ -317,7 +311,7 @@ export default function LendingHealthPage() {
             </div>
 
             <div className={styles.tooltipContainer}>
-              <div className={`${styles.miniCardValue} ${styles['status' + getLTVStatus(current.totalPropertyLTV)]}`}>
+              <div className={styles.miniCardValue}>
                 {formatPercent(current.totalPropertyLTV)}
               </div>
 
