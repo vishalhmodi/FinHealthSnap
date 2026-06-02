@@ -90,3 +90,26 @@ echo "Success! Release package is ready:"
 echo "Location: $(pwd)/${RELEASE_DIR}"
 echo "Zip Archive: $(pwd)/${RELEASE_DIR}.zip"
 echo "=================================================="
+
+# Load .env variables if the file exists
+if [ -f ".env" ]; then
+  # Load env variables (ignore comments)
+  export $(grep -v '^#' .env | xargs)
+fi
+
+echo ""
+read -p "Do you want to copy this release archive to Google Drive? (Y/N) " -n 1 -r
+echo ""
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  if [ -z "$GOOGLE_DRIVE_RELEASE_PATH" ]; then
+    echo "Error: GOOGLE_DRIVE_RELEASE_PATH is not set in your .env file."
+    echo "Please add it (e.g. GOOGLE_DRIVE_RELEASE_PATH=\"/Users/vicky/Library/CloudStorage/GoogleDrive-.../Releases\")"
+  elif [ ! -d "$GOOGLE_DRIVE_RELEASE_PATH" ]; then
+    echo "Error: The directory '$GOOGLE_DRIVE_RELEASE_PATH' does not exist."
+    echo "Please check the GOOGLE_DRIVE_RELEASE_PATH in your .env file."
+  else
+    echo "Copying to Google Drive..."
+    cp "${BASE_DIR}/${PREFIX}-${SUFFIX}.zip" "$GOOGLE_DRIVE_RELEASE_PATH/"
+    echo "Successfully copied to $GOOGLE_DRIVE_RELEASE_PATH/"
+  fi
+fi
