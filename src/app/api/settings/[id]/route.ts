@@ -26,6 +26,8 @@ export async function DELETE(
       const inUse = await prisma.account.findFirst({ where: { institutionId: id } });
       if (inUse) return NextResponse.json({ error: 'Cannot delete: This Institution is in use by an existing account.' }, { status: 400 });
       await prisma.institution.delete({ where: { id, userId: user.userId } });
+    } else if (type === 'CUSTOM_CATEGORY') {
+      await prisma.customItemCategory.delete({ where: { id, userId: user.userId } });
     } else {
       return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
     }

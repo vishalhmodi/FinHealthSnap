@@ -11,12 +11,15 @@ export default function SettingsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [owners, setOwners] = useState<Owner[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [customCategories, setCustomCategories] = useState<{id: string, name: string, type: string}[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Form states
   const [newCat, setNewCat] = useState('');
   const [newOwner, setNewOwner] = useState('');
   const [newInst, setNewInst] = useState('');
+  const [newAssetCat, setNewAssetCat] = useState('');
+  const [newLiabCat, setNewLiabCat] = useState('');
 
   // Password change states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -33,13 +36,14 @@ export default function SettingsPage() {
         setCategories(data.categories || []);
         setOwners(data.owners || []);
         setInstitutions(data.institutions || []);
+        setCustomCategories(data.customItemCategories || []);
       })
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  async function handleAdd(type: 'CATEGORY' | 'OWNER' | 'INSTITUTION', name: string, setter: (v: string) => void) {
+  async function handleAdd(type: 'CATEGORY' | 'OWNER' | 'INSTITUTION' | 'CUSTOM_CATEGORY_ASSET' | 'CUSTOM_CATEGORY_LIABILITY', name: string, setter: (v: string) => void) {
     if (!name.trim()) return;
     try {
       const res = await fetch('/api/settings', {
@@ -59,7 +63,7 @@ export default function SettingsPage() {
     }
   }
 
-  async function handleDelete(type: 'CATEGORY' | 'OWNER' | 'INSTITUTION', id: string) {
+  async function handleDelete(type: 'CATEGORY' | 'OWNER' | 'INSTITUTION' | 'CUSTOM_CATEGORY', id: string) {
     if (!confirm('Are you sure you want to delete this item? It might be in use.')) return;
     try {
       const res = await fetch(`/api/settings/${id}?type=${type}`, { method: 'DELETE' });
@@ -107,7 +111,7 @@ export default function SettingsPage() {
     }
   }
 
-  const renderSection = (title: string, items: any[], type: 'CATEGORY'|'OWNER'|'INSTITUTION', val: string, setVal: (v: string) => void, placeholder: string) => (
+  const renderSection = (title: string, items: any[], type: 'CATEGORY'|'OWNER'|'INSTITUTION'|'CUSTOM_CATEGORY_ASSET'|'CUSTOM_CATEGORY_LIABILITY', val: string, setVal: (v: string) => void, placeholder: string) => (
     <div className={`glass-card ${styles.section}`}>
       <h2 className={styles.sectionTitle}>{title}</h2>
       <div className={styles.itemList}>
@@ -116,7 +120,7 @@ export default function SettingsPage() {
         ) : items.map(item => (
           <div key={item.id} className={styles.itemRow}>
             <span>{item.name}</span>
-            <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--color-liability-text)' }} onClick={() => handleDelete(type, item.id)}>×</button>
+            <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--color-liability-text)' }} onClick={() => handleDelete(type.startsWith('CUSTOM_CATEGORY') ? 'CUSTOM_CATEGORY' : type, item.id)}>×</button>
           </div>
         ))}
       </div>
@@ -145,6 +149,8 @@ export default function SettingsPage() {
         {renderSection('Investment Types', categories, 'CATEGORY', newCat, setNewCat, 'e.g. TFSA, Crypto')}
         {renderSection('Individuals / Owners', owners, 'OWNER', newOwner, setNewOwner, 'e.g. John, Family')}
         {renderSection('Institutions', institutions, 'INSTITUTION', newInst, setNewInst, 'e.g. TD Bank, Questrade')}
+        {renderSection('Custom Asset Types', customCategories.filter(c => c.type === 'ASSET'), 'CUSTOM_CATEGORY_ASSET', newAssetCat, setNewAssetCat, 'e.g. Real Estate, Vehicle')}
+        {renderSection('Custom Liability Types', customCategories.filter(c => c.type === 'LIABILITY'), 'CUSTOM_CATEGORY_LIABILITY', newLiabCat, setNewLiabCat, 'e.g. Mortgage, Auto Loan')}
       </div>
 
       <div className={`glass-card ${styles.section}`}>

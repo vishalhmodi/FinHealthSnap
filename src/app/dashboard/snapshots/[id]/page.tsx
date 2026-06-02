@@ -163,7 +163,12 @@ export default function SnapshotPage() {
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [newAccountData, setNewAccountData] = useState({ categoryName: '', ownerName: '', institutionName: '' });
   const [addingAccount, setAddingAccount] = useState(false);
-  const [presets, setPresets] = useState<{ categories: Category[], owners: Owner[], institutions: Institution[] }>({ categories: [], owners: [], institutions: [] });
+  const [presets, setPresets] = useState<{ 
+    categories: Category[], 
+    owners: Owner[], 
+    institutions: Institution[],
+    customCategories: {id: string, name: string, type: string}[]
+  }>({ categories: [], owners: [], institutions: [], customCategories: [] });
 
   const loadData = useCallback(() => {
     Promise.all([
@@ -174,7 +179,8 @@ export default function SnapshotPage() {
       setPresets({
         categories: accountsData.categories || [],
         owners: accountsData.owners || [],
-        institutions: accountsData.institutions || []
+        institutions: accountsData.institutions || [],
+        customCategories: accountsData.customItemCategories || []
       });
       if (accountsData.categories?.length && accountsData.owners?.length && accountsData.institutions?.length) {
         setNewAccountData({
@@ -479,24 +485,13 @@ export default function SnapshotPage() {
                       >
                         <option value="">-- Kind --</option>
                         {item.itemType === 'ASSET' ? (
-                          <>
-                            <option value="Real Estate">Real Estate</option>
-                            <option value="Vehicle">Vehicle</option>
-                            <option value="Cash/Bank">Cash / Bank</option>
-                            <option value="Investment">Investment</option>
-                            <option value="Business">Business</option>
-                            <option value="Other Asset">Other Asset</option>
-                          </>
+                          presets.customCategories.filter(c => c.type === 'ASSET').map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))
                         ) : (
-                          <>
-                            <option value="Mortgage">Mortgage</option>
-                            <option value="HELOC">HELOC</option>
-                            <option value="Auto Loan">Auto Loan</option>
-                            <option value="Student Loan">Student Loan</option>
-                            <option value="Personal Loan">Personal Loan</option>
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="Other Liability">Other Liability</option>
-                          </>
+                          presets.customCategories.filter(c => c.type === 'LIABILITY').map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                          ))
                         )}
                       </select>
                       <input

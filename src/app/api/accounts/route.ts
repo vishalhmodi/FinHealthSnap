@@ -7,7 +7,7 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const [accounts, categories, institutions, owners] = await Promise.all([
+  const [accounts, categories, institutions, owners, customItemCategories] = await Promise.all([
     prisma.account.findMany({
       where: { userId: user.userId, isActive: true },
       include: { category: true, institution: true, owner: true },
@@ -16,9 +16,10 @@ export async function GET() {
     prisma.accountCategory.findMany({ where: { userId: user.userId }, orderBy: { sortOrder: 'asc' } }),
     prisma.institution.findMany({ where: { userId: user.userId }, orderBy: { name: 'asc' } }),
     prisma.owner.findMany({ where: { userId: user.userId }, orderBy: { name: 'asc' } }),
+    prisma.customItemCategory.findMany({ where: { userId: user.userId }, orderBy: { name: 'asc' } }),
   ]);
 
-  return NextResponse.json({ accounts, categories, institutions, owners });
+  return NextResponse.json({ accounts, categories, institutions, owners, customItemCategories });
 }
 
 // POST /api/accounts — create a new account (or return existing) and optionally initialize balance
