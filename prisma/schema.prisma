@@ -124,6 +124,7 @@ model CustomAssetLiability {
   name      String   // e.g. "Primary House", "Invest. House-1", "Heloc"
   detail    String   // e.g. "Equity", "Mortgage", "PrimaryHouse"
   itemType  String   // "ASSET" or "LIABILITY"
+  category  String?  // e.g. "Real Estate", "Mortgage", "HELOC"
   amount    Float    // Always positive; sign determined by itemType
   sortOrder Int      @default(0)
   updatedAt DateTime @updatedAt

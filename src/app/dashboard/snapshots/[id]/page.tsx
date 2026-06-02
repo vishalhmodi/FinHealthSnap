@@ -30,6 +30,7 @@ interface CustomItem {
   amount: number;
   sortOrder: number;
   linkedAssetId?: string;
+  category?: string | null;
 }
 
 interface QuarterData {
@@ -469,6 +470,35 @@ export default function SnapshotPage() {
                         <option value="ASSET">Asset</option>
                         <option value="LIABILITY">Liability</option>
                       </select>
+                      <select
+                        className="form-input"
+                        value={item.category || ''}
+                        onChange={(e) => handleCustomChange(idx, 'category', e.target.value)}
+                        id={`custom-category-${idx}`}
+                        style={{ minWidth: 140 }}
+                      >
+                        <option value="">-- Kind --</option>
+                        {item.itemType === 'ASSET' ? (
+                          <>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Vehicle">Vehicle</option>
+                            <option value="Cash/Bank">Cash / Bank</option>
+                            <option value="Investment">Investment</option>
+                            <option value="Business">Business</option>
+                            <option value="Other Asset">Other Asset</option>
+                          </>
+                        ) : (
+                          <>
+                            <option value="Mortgage">Mortgage</option>
+                            <option value="HELOC">HELOC</option>
+                            <option value="Auto Loan">Auto Loan</option>
+                            <option value="Student Loan">Student Loan</option>
+                            <option value="Personal Loan">Personal Loan</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Other Liability">Other Liability</option>
+                          </>
+                        )}
+                      </select>
                       <input
                         type="number"
                         className={`form-input form-input-currency ${styles.customAmtInput}`}
@@ -501,7 +531,10 @@ export default function SnapshotPage() {
                   ) : (
                     <div className={styles.customViewRow}>
                       <div className={styles.customItemMeta}>
-                        <span className={styles.customItemName}>{item.name}</span>
+                        <span className={styles.customItemName}>
+                          {item.name} 
+                          {item.category && <span style={{ fontSize: '0.7em', padding: '2px 6px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', marginLeft: '6px' }}>{item.category}</span>}
+                        </span>
                         <span className={styles.customItemDetail}>{item.detail}</span>
                         {item.linkedAssetId && item.itemType === 'LIABILITY' && (
                           <span style={{ fontSize: '0.75rem', color: 'var(--color-liability-text)', display: 'block', marginTop: '2px' }}>
