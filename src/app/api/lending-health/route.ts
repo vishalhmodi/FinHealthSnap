@@ -69,6 +69,28 @@ export async function GET() {
     const totalRealEstateDebt = properties.reduce((sum, p) => sum + p.linkedDebt, 0);
     const totalPropertyLTV = totalRealEstateValue > 0 ? totalRealEstateDebt / totalRealEstateValue : 0;
 
+    // Health Score Calculation
+    let score = 0;
+    
+    // Leverage (Max 35)
+    if (leverageRatio < 0.4) score += 35;
+    else if (leverageRatio < 0.6) score += 20;
+    else if (leverageRatio < 0.8) score += 10;
+    
+    // Liquidity (Max 35)
+    if (liquidityRatio > 1.0) score += 35;
+    else if (liquidityRatio > 0.5) score += 20;
+    else if (liquidityRatio > 0.1) score += 10;
+
+    // LTV (Max 30)
+    if (totalPropertyLTV < 0.8) score += 30;
+    else if (totalPropertyLTV < 0.9) score += 15;
+    else if (totalPropertyLTV < 1.0) score += 5;
+    
+    if (totalRealEstateValue === 0) {
+      score = Math.round((score / 70) * 100);
+    }
+
     return {
       quarterId: q.id,
       label: q.label,
@@ -79,6 +101,7 @@ export async function GET() {
       leverageRatio,
       liquidityRatio,
       totalPropertyLTV,
+      healthScore: score,
       properties
     };
   });
