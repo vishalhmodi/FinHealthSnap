@@ -130,20 +130,33 @@ export default function LendingHealthPage() {
 
   const getLeverageStatus = (ratio: number) => {
     if (ratio < 0.2) return 'Good';
-    if (ratio < 0.5) return 'Warn';
-    return 'Danger';
+    if (ratio < 0.5) return 'Moderate';
+    return 'Poor';
   };
 
   const getLiquidityStatus = (ratio: number) => {
-    if (ratio > 1.0) return 'Good';
-    if (ratio > 0.5) return 'Warn';
-    return 'Danger';
+    if (ratio > 1.0) return 'Strong';
+    if (ratio > 0.5) return 'Moderate';
+    return 'Weak';
   };
 
   const getLTVStatus = (ratio: number) => {
     if (ratio < 0.8) return 'Good';
-    if (ratio < 0.9) return 'Warn';
-    return 'Danger';
+    if (ratio < 0.9) return 'High';
+    return 'Critical';
+  };
+
+  const getColorClasses = (status: string) => {
+    if (status === 'Good' || status === 'Strong' || status === 'Excellent') return { text: styles.colorGreen, border: styles.borderGreen, badge: styles.statusGood };
+    if (status === 'Moderate' || status === 'Fair') return { text: styles.colorOrange, border: styles.borderOrange, badge: styles.statusWarn };
+    return { text: styles.colorRed, border: styles.borderRed, badge: styles.statusDanger };
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return '#10b981';
+    if (score >= 60) return '#eab308';
+    if (score >= 40) return '#f59e0b';
+    return '#ef4444';
   };
 
   const scoreData = getScoreStatus(current.healthScore);
@@ -157,7 +170,7 @@ export default function LendingHealthPage() {
   } else {
     if (current.totalPropertyLTV > 0.8) recommendation = "Consider lowering your property LTV to avoid mortgage insurance and get better rates.";
     else if (current.liquidityRatio < 0.5) recommendation = "Maintain liquidity and consider lowering debt to strengthen your profile.";
-    else if (current.leverageRatio > 0.6) recommendation = "Your Debt-to-Asset ratio is high. Focus on paying down liabilities.";
+    else if (current.leverageRatio > 0.5) recommendation = "Your Debt-to-Asset ratio is high. Focus on paying down liabilities.";
   }
 
   const chartData = current.properties.map(p => ({
@@ -200,26 +213,29 @@ export default function LendingHealthPage() {
         <div className={`${styles.scorePanel} glass-card`}>
           <h2>Overall Health Score</h2>
           <div className={styles.circularScore}>
-            <svg className={styles.scoreCircleSvg} viewBox="0 0 200 120">
-              <defs>
-                <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="50%" stopColor="#eab308" />
-                  <stop offset="100%" stopColor="#ea580c" />
-                </linearGradient>
-              </defs>
-              {/* Semi-circle background path */}
-              <path 
-                className={styles.scoreBg} 
-                d="M 30 100 A 70 70 0 0 1 170 100" 
-                stroke="url(#scoreGradient)"
-                strokeWidth="24"
+            <svg className={styles.scoreCircleSvg} viewBox="0 0 200 200" style={{ width: '200px', height: '200px' }}>
+              {/* Background track */}
+              <circle 
+                cx="100" cy="100" r="80" 
+                fill="none" 
+                stroke="var(--glass-border-strong)" 
+                strokeWidth="20" 
+              />
+              {/* Animated Progress Ring */}
+              <circle 
+                cx="100" cy="100" r="80" 
+                fill="none" 
+                stroke={getScoreColor(current.healthScore)}
+                strokeWidth="20" 
                 strokeLinecap="round"
-                fill="none"
+                strokeDasharray={circleCircumference}
+                strokeDashoffset={strokeDashoffset}
+                transform="rotate(-90 100 100)"
+                style={{ transition: 'stroke-dashoffset 1.5s ease-in-out, stroke 1.5s ease-in-out' }}
               />
             </svg>
-            <div className={styles.scoreTextContainer} style={{ position: 'absolute', bottom: '10px', width: '100%', textAlign: 'center' }}>
-              <div className={styles.scoreValue}>{current.healthScore}</div>
+            <div className={styles.scoreTextContainer} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+              <div className={styles.scoreValue} style={{ color: getScoreColor(current.healthScore), textShadow: `0 0 20px ${getScoreColor(current.healthScore)}40` }}>{current.healthScore}</div>
               <div style={{ fontSize: '1rem', color: '#94a3b8' }}>/100</div>
             </div>
           </div>
@@ -234,14 +250,14 @@ export default function LendingHealthPage() {
         {/* TOP RIGHT: CORE METRICS ROW */}
         <div className={styles.metricsRow}>
           {/* Debt-to-Asset Ratio */}
-          <div className={`${styles.miniCard} ${styles.borderOrange} glass-card`}>
+          <div className={`${styles.miniCard} ${getColorClasses(getLeverageStatus(current.leverageRatio)).border} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconOrange}`}>📊</div>
               <div className={styles.miniCardTitle}>Debt-to-Asset Ratio</div>
             </div>
             
             <div className={styles.tooltipContainer}>
-              <div className={`${styles.miniCardValue} ${styles.colorOrange}`}>
+              <div className={`${styles.miniCardValue} ${getColorClasses(getLeverageStatus(current.leverageRatio)).text}`}>
                 {formatPercent(current.leverageRatio)}
               </div>
               
@@ -263,20 +279,24 @@ export default function LendingHealthPage() {
               </div>
             </div>
 
-            <div className={`${styles.miniCardIdeal} ${styles['status' + getLeverageStatus(current.leverageRatio)]}`}>
-              {getLeverageStatus(current.leverageRatio) === 'Good' ? 'Good' : getLeverageStatus(current.leverageRatio) === 'Warn' ? 'Moderate' : 'Poor'}
+            <div className={`${styles.miniCardIdeal} ${getColorClasses(getLeverageStatus(current.leverageRatio)).badge}`}>
+              {getLeverageStatus(current.leverageRatio)}
+            </div>
+
+            <div className={styles.miniCardDesc}>
+              A high ratio means you owe more compared to what you own. Keeping this under 20% (Good) strongly boosts your score.
             </div>
           </div>
 
           {/* Liquidity to Debt Ratio */}
-          <div className={`${styles.miniCard} ${styles.borderGreen} glass-card`}>
+          <div className={`${styles.miniCard} ${getColorClasses(getLiquidityStatus(current.liquidityRatio)).border} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconGreen}`}>💧</div>
               <div className={styles.miniCardTitle}>Liquidity to Debt Ratio</div>
             </div>
 
             <div className={styles.tooltipContainer}>
-              <div className={`${styles.miniCardValue} ${styles.colorBlue}`}>
+              <div className={`${styles.miniCardValue} ${getColorClasses(getLiquidityStatus(current.liquidityRatio)).text}`}>
                 {formatPercent(current.liquidityRatio)}
               </div>
 
@@ -298,43 +318,51 @@ export default function LendingHealthPage() {
               </div>
             </div>
 
-            <div className={`${styles.miniCardIdeal} ${styles['status' + getLiquidityStatus(current.liquidityRatio)]}`}>
-              {getLiquidityStatus(current.liquidityRatio) === 'Good' ? 'Strong' : 'Weak'}
+            <div className={`${styles.miniCardIdeal} ${getColorClasses(getLiquidityStatus(current.liquidityRatio)).badge}`}>
+              {getLiquidityStatus(current.liquidityRatio)}
+            </div>
+
+            <div className={styles.miniCardDesc}>
+              Measures your ability to cover debts with easily accessible cash. Over 100% (Strong) is ideal for lending safety.
             </div>
           </div>
 
           {/* Aggregate LTV */}
-          <div className={`${styles.miniCard} ${styles.borderYellow} glass-card`}>
+          <div className={`${styles.miniCard} ${getColorClasses(getLTVStatus(current.totalPropertyLTV)).border} glass-card`}>
             <div className={styles.miniCardHeader}>
               <div className={`${styles.iconWrapper} ${styles.iconYellow}`}>🏠</div>
               <div className={styles.miniCardTitle}>Aggregate LTV</div>
             </div>
 
             <div className={styles.tooltipContainer}>
-              <div className={`${styles.miniCardValue} ${styles.colorGreen}`}>
+              <div className={`${styles.miniCardValue} ${getColorClasses(getLTVStatus(current.totalPropertyLTV)).text}`}>
                 {formatPercent(current.totalPropertyLTV)}
               </div>
 
               <div className={styles.tooltipBox}>
                 <div style={{ fontWeight: 600, marginBottom: '8px' }}>Calculation</div>
                 <div className={styles.tooltipRow}>
-                  <span>Real Estate Debt:</span>
+                  <span>Total Mortgage Debt:</span>
                   <strong>{formatCurrency(current.totalRealEstateDebt)}</strong>
                 </div>
                 <div className={styles.tooltipRow}>
-                  <span>Real Estate Value:</span>
+                  <span>Total Real Estate Value:</span>
                   <strong>{formatCurrency(current.totalRealEstateValue)}</strong>
                 </div>
                 <div className={styles.tooltipDivider} />
                 <div className={styles.tooltipRow}>
                   <span>Formula:</span>
-                  <strong>Debt ÷ Value</strong>
+                  <strong>Debt ÷ Real Estate Value</strong>
                 </div>
               </div>
             </div>
 
-            <div className={`${styles.miniCardIdeal} ${styles['status' + getLTVStatus(current.totalPropertyLTV)]}`}>
-              {getLTVStatus(current.totalPropertyLTV) === 'Good' ? 'Good' : 'High'}
+            <div className={`${styles.miniCardIdeal} ${getColorClasses(getLTVStatus(current.totalPropertyLTV)).badge}`}>
+              {getLTVStatus(current.totalPropertyLTV)}
+            </div>
+
+            <div className={styles.miniCardDesc}>
+              The ratio of your mortgage balances to property values. Lenders prefer this under 80% (Good) to offer the best rates.
             </div>
           </div>
         </div>
