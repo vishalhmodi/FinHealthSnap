@@ -10,6 +10,12 @@
 # without deleting existing data.
 # ==============================================================================
 
+if [ -f "$(dirname "$0")/docker-compose.yml" ]; then
+    cd "$(dirname "$0")"
+elif [ -f "$(dirname "$0")/../docker-compose.yml" ]; then
+    cd "$(dirname "$0")/.."
+fi
+
 echo "Syncing database schema with latest application changes..."
 npx prisma db push --accept-data-loss
 echo "Database update complete. It is now safe to start the application."

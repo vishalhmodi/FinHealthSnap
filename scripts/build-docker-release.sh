@@ -75,10 +75,11 @@ echo ""
 echo "-> Copying Setup Instructions"
 cp docs/user-guides/mac/Application-Setup_mac.pdf "${RELEASE_DIR}/"
 cp docs/user-guides/windows/Application-Setup_windows.pdf "${RELEASE_DIR}/"
-cp scripts/update-db-schema.sh "${RELEASE_DIR}/" 2>/dev/null || true
-cp scripts/update-db-schema.bat "${RELEASE_DIR}/" 2>/dev/null || true
-cp scripts/manage-docker.sh "${RELEASE_DIR}/" 2>/dev/null || true
-cp scripts/manage-docker.bat "${RELEASE_DIR}/" 2>/dev/null || true
+mkdir -p "${RELEASE_DIR}/mac" "${RELEASE_DIR}/windows"
+cp scripts/mac/update-db-schema.sh "${RELEASE_DIR}/mac/" 2>/dev/null || true
+cp scripts/windows/update-db-schema.bat "${RELEASE_DIR}/windows/" 2>/dev/null || true
+cp scripts/mac/manage-docker.sh "${RELEASE_DIR}/mac/" 2>/dev/null || true
+cp scripts/windows/manage-docker.bat "${RELEASE_DIR}/windows/" 2>/dev/null || true
 echo ""
 echo "-> Creating empty prisma directory"
 mkdir -p "${RELEASE_DIR}/prisma"

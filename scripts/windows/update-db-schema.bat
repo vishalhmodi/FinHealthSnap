@@ -10,6 +10,12 @@
 :: without deleting existing data.
 :: ==============================================================================
 
+if exist "%~dp0docker-compose.yml" (
+    cd /d "%~dp0"
+) else if exist "%~dp0..\docker-compose.yml" (
+    cd /d "%~dp0.."
+)
+
 echo Syncing database schema with latest application changes...
 call npx prisma db push --accept-data-loss
 echo Database update complete. It is now safe to start the application.
