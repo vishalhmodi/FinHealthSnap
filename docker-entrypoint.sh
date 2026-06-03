@@ -7,7 +7,7 @@ npx prisma db push --accept-data-loss
 
 # Automatically seed the database if it is brand new (seed.mjs will skip if users exist)
 echo "Checking if database needs to be seeded..."
-node prisma/seed.mjs || true
+node seed.mjs || true
 
 echo "Starting Next.js application..."
 exec "$@"

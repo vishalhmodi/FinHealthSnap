@@ -23,7 +23,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Compile seed script for standalone execution
-RUN npx -y esbuild prisma/seed.ts --bundle --platform=node --format=esm --outfile=prisma/seed.mjs --packages=external
+RUN npx -y esbuild prisma/seed.ts --bundle --platform=node --format=esm --outfile=seed.mjs --packages=external
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -58,7 +58,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Copy Prisma schema, config, seed script, and entrypoint script
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/schema.prisma ./prisma/
-COPY --from=builder --chown=nextjs:nodejs /app/prisma/seed.mjs ./prisma/
+COPY --from=builder --chown=nextjs:nodejs /app/seed.mjs ./
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./
 COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./
 RUN chmod +x ./docker-entrypoint.sh
