@@ -73,8 +73,8 @@ EOF
 
 echo ""
 echo "-> Copying Setup Instructions"
-cp docs/Application-Setup_mac.pdf "${RELEASE_DIR}/"
-cp docs/Application-Setup_windows.pdf "${RELEASE_DIR}/"
+cp docs/user-guides/mac/Application-Setup_mac.pdf "${RELEASE_DIR}/"
+cp docs/user-guides/windows/Application-Setup_windows.pdf "${RELEASE_DIR}/"
 cp scripts/update-db-schema.sh "${RELEASE_DIR}/" 2>/dev/null || true
 cp scripts/update-db-schema.bat "${RELEASE_DIR}/" 2>/dev/null || true
 cp scripts/manage-docker.sh "${RELEASE_DIR}/" 2>/dev/null || true
