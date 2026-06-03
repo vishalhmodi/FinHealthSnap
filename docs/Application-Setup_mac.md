@@ -24,7 +24,7 @@ Follow these instructions to launch FinHealthSnap on your Mac.
 You have two options for your data:
 
 ### Option A: Start Fresh (Recommended for new users)
-You don't need to do anything. The default `docker-compose.yml` file is already set up to create a brand new, permanent database for you.
+You don't need to do anything. The default `docker-compose.yml` file is already set up to create a brand new, permanent database for you. It will automatically populate the new database with sample demo accounts (`demoUSA@snapshot.local` and `demoCA@snapshot.local`) so you can explore the app immediately!
 
 ### Option B: Use an Existing Database
 If you received an existing `dev.db` file containing old data:

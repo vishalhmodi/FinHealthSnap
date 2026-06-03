@@ -13,14 +13,12 @@ const adapter = new PrismaLibSql({ url: `file:${dbPath}` });
 const prisma = new PrismaClient({ adapter } as any);
 
 async function main() {
-  console.log('Clearing existing seed users (leaving real user data intact)...');
-  await prisma.user.deleteMany({
-    where: {
-      email: {
-        in: ['user@example.com', 'demoUSA@snapshot.local', 'demoCA@snapshot.local']
-      }
-    }
-  });
+  const userCount = await prisma.user.count();
+  if (userCount > 0) {
+    console.log('Database already contains users. Skipping automatic seed.');
+    return;
+  }
+  console.log('Brand new database detected. Seeding demo users...');
 
   // Create User
   const passwordHash = await bcrypt.hash('password123', 10);
