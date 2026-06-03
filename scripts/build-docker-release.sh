@@ -76,6 +76,8 @@ echo "-> Copying Setup Instructions"
 cp docs/user-guides/mac/Application-Setup_mac.pdf "${RELEASE_DIR}/"
 cp docs/user-guides/windows/Application-Setup_windows.pdf "${RELEASE_DIR}/"
 mkdir -p "${RELEASE_DIR}/mac" "${RELEASE_DIR}/windows"
+cp scripts/mac/load-image.sh "${RELEASE_DIR}/mac/" 2>/dev/null || true
+cp scripts/windows/load-image.bat "${RELEASE_DIR}/windows/" 2>/dev/null || true
 cp scripts/mac/update-db-schema.sh "${RELEASE_DIR}/mac/" 2>/dev/null || true
 cp scripts/windows/update-db-schema.bat "${RELEASE_DIR}/windows/" 2>/dev/null || true
 cp scripts/mac/manage-docker.sh "${RELEASE_DIR}/mac/" 2>/dev/null || true
