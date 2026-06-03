@@ -38,3 +38,7 @@ else
     echo "Application started successfully in the background!"
     echo "You can access it at: http://localhost:3005 (or whichever port is configured)"
 fi
+
+echo ""
+read -n 1 -s -r -p "Press any key to exit..."
+echo ""
