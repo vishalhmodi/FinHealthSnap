@@ -5,8 +5,9 @@ set -e
 echo "Syncing database schema..."
 npx prisma db push --accept-data-loss
 
-# Check if there is a dev.db but no accounts yet, and maybe seed, though the user can seed manually.
-# For now, just starting the server is fine because the API handles creation.
+# Automatically seed the database if it is brand new (seed.mjs will skip if users exist)
+echo "Checking if database needs to be seeded..."
+node seed.mjs || true
 
 echo "Starting Next.js application..."
 exec "$@"

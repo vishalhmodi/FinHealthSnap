@@ -478,6 +478,30 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+              {/* Category Balances Tiles */}
+              <div className={styles.fullWidthChart}>
+                <h2 className={styles.chartTitle} style={{ marginBottom: '16px' }}>Investment Type Balances</h2>
+                <div className={styles.metricsGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+                  {Object.entries(latest.categoryBreakdown || {}).map(([name, amount]) => {
+                    const prevAmount = prev?.categoryBreakdown?.[name] || 0;
+                    const deltaAmount = prev ? (amount as number) - prevAmount : undefined;
+                    const deltaPercent = prev && prevAmount !== 0 ? (deltaAmount! / Math.abs(prevAmount)) * 100 : undefined;
+                    
+                    return (
+                      <MetricCard
+                        key={name}
+                        title={name}
+                        amount={amount as number}
+                        type={(amount as number) >= 0 ? 'asset' : 'liability'}
+                        deltaAmount={deltaAmount}
+                        deltaPercent={deltaPercent}
+                        deltaLabel={prev?.label}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Donut Charts: Asset Allocation & Distribution */}
               <div className={`glass-card ${styles.chartCard} ${styles.fullWidthChart}`}>
                 <h2 className={styles.chartTitle}>Asset Allocation</h2>
@@ -788,6 +812,30 @@ export default function DashboardPage() {
             </div>
             </>
           )}
+
+              {/* Individual Balances Tiles */}
+              <div className={styles.fullWidthChart} style={{ marginBottom: '20px' }}>
+                <h2 className={styles.chartTitle} style={{ marginBottom: '16px' }}>Balances by Individual</h2>
+                <div className={styles.metricsGrid} style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+                  {Object.entries(latest.ownerBreakdown || {}).map(([name, amount]) => {
+                    const prevAmount = prev?.ownerBreakdown?.[name] || 0;
+                    const deltaAmount = prev ? (amount as number) - prevAmount : undefined;
+                    const deltaPercent = prev && prevAmount !== 0 ? (deltaAmount! / Math.abs(prevAmount)) * 100 : undefined;
+                    
+                    return (
+                      <MetricCard
+                        key={name}
+                        title={name}
+                        amount={amount as number}
+                        type={(amount as number) >= 0 ? 'asset' : 'liability'}
+                        deltaAmount={deltaAmount}
+                        deltaPercent={deltaPercent}
+                        deltaLabel={prev?.label}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
 
           {/* Quarters List */}
           <div className={`glass-card ${styles.quartersCard}`}>
