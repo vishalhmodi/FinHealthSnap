@@ -23,7 +23,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Compile seed script for standalone execution
-RUN npx -y esbuild prisma/seed.ts --bundle --platform=node --format=esm --outfile=seed.mjs --packages=external
+RUN npx -y esbuild prisma/seed.ts --bundle --platform=node --format=esm --outfile=seed.mjs --external:@prisma/client --external:@libsql/client --external:@prisma/adapter-libsql
 
 # Production image, copy all the files and run next
 FROM base AS runner
