@@ -7,8 +7,15 @@ import { resolve, dirname } from 'node:path';
 import bcrypt from 'bcryptjs';
 
 const __dirname2 = dirname(fileURLToPath(import.meta.url));
-const dbPath = resolve(__dirname2, 'dev.db');
-const adapter = new PrismaLibSql({ url: `file:${dbPath}` });
+let dbPath = resolve(__dirname2, 'dev.db');
+if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('file:')) {
+  let envPath = process.env.DATABASE_URL.replace('file:', '');
+  if (!envPath.startsWith('/')) {
+    envPath = resolve(process.cwd(), envPath);
+  }
+  dbPath = envPath;
+}
+const adapter = new PrismaLibSql({ url: `file:${dbPath}` } as any);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const prisma = new PrismaClient({ adapter } as any);
 
