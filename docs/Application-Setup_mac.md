@@ -23,12 +23,17 @@ Follow these instructions to launch FinHealthSnap on your Mac.
 
 You have two options for your data:
 
-### Option A: Start Fresh (Recommended for new users)
-You don't need to do anything. The default `docker-compose.yml` file is already set up to create a brand new, permanent database for you. It will automatically populate the new database with sample demo accounts (`demoUSA@snapshot.local` and `demoCA@snapshot.local`) so you can explore the app immediately!
+### Option A: Start Fresh with Docker Storage (Default)
+You don't need to do anything. The default `docker-compose.yml` file is already set up to create a brand new, permanent database for you inside Docker's hidden internal storage. It will automatically populate the new database with sample demo accounts (`demoUSA@snapshot.local` and `demoCA@snapshot.local`) so you can explore the app immediately!
 
-### Option B: Use an Existing Database
-If you received an existing `dev.db` file containing old data:
-1. Place your `dev.db` file inside the existing `prisma` folder.
+> [!WARNING]
+> **Consequence of Option A:** Because the database is hidden inside Docker, if you download a new version of the app later and unzip it into a *new folder*, Docker will create a brand new, empty database for that new folder. Your old data won't automatically carry over unless you unzip the new version over the *exact same folder*.
+
+### Option B: Use a Visible Database File (Best for easy upgrades)
+If you prefer to have your database file visible right in your folder (so you can easily back it up or copy it to a new version folder later):
+
+1. **If you have an existing database:** Place your old `dev.db` file inside the existing `prisma` folder.
+   **If you are starting fresh:** Open your Terminal, navigate into the `prisma` folder, and create an empty file by running `touch dev.db`.
 2. Open `docker-compose.yml` in a text editor (like TextEdit).
 3. Update your secrets: Ensure `NEXTAUTH_SECRET` and `JWT_SECRET` in `docker-compose.yml` match the values from your original `.env` file. If they do not match, you will get an "invalid credential" error when logging in.
 4. Find the `volumes:` section and change it to look exactly like this:
