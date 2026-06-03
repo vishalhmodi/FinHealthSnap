@@ -5,9 +5,9 @@ set -e
 echo "Syncing database schema..."
 npx prisma db push --accept-data-loss
 
-# Automatically seed the database if it is brand new (seed.ts will skip if users exist)
+# Automatically seed the database if it is brand new (seed.mjs will skip if users exist)
 echo "Checking if database needs to be seeded..."
-npm run seed || true
+node prisma/seed.mjs || true
 
 echo "Starting Next.js application..."
 exec "$@"
