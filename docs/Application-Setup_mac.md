@@ -28,13 +28,13 @@ You don't need to do anything. The default `docker-compose.yml` file is already 
 
 ### Option B: Use an Existing Database
 If you received an existing `dev.db` file containing old data:
-1. Create a folder named `prisma` inside the `FinHealthSnap_App` folder.
-2. Place the `dev.db` file inside that `prisma` folder.
-3. Open `docker-compose.yml` in a text editor (like TextEdit).
+1. Place your `dev.db` file inside the existing `prisma` folder.
+2. Open `docker-compose.yml` in a text editor (like TextEdit).
+3. Update your secrets: Ensure `NEXTAUTH_SECRET` and `JWT_SECRET` in `docker-compose.yml` match the values from your original `.env` file. If they do not match, you will get an "invalid credential" error when logging in.
 4. Find the `volumes:` section and change it to look exactly like this:
    ```yaml
        volumes:
-         - ./prisma:/app/prisma
+         - ./prisma/dev.db:/app/prisma/dev.db
    ```
 5. Delete the bottom two lines (`volumes:` and `  finhealth-db:`).
 
@@ -47,12 +47,19 @@ In your Terminal (inside the `FinHealthSnap_App` folder), run:
 *(Note: If you are starting fresh with Option A, you can skip this step.)*
 
 ## Step 5: Launch the Application
+> [!WARNING]
+> **NEVER** click "Run" on the image directly inside the Docker Desktop app. Doing so creates a rogue container that ignores your configuration and will cause port conflicts. Always use the terminal commands below.
+
 In your Terminal (still inside the `FinHealthSnap_App` folder), run:
 ```bash
 docker compose up -d
 ```
+*(Note: If you are on an M-series Mac, you may see a warning about the platform `linux/amd64` not matching `linux/arm64/v8`. You can safely ignore this warning.)*
 
 ## Step 6: Access the App
+> [!NOTE]
+> The terminal logs might say the app is running at `http://localhost:3000`, but because of our Docker mapping, you must use port 3005.
+
 1. Open your web browser and go to: **[http://localhost:3005](http://localhost:3005)**
 2. If you chose Option A (Fresh Start), click "Register" or "Sign Up" to create your new account.
 3. If you chose Option B, log in with your existing credentials.

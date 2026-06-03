@@ -64,7 +64,7 @@ services:
       # Option 2: Share an existing dev.db file
       # If the user already has a dev.db file, they should place it in a 'prisma' folder next to this file.
       # To use Option 2: comment out Option 1 above, uncomment Option 2 below, and DELETE the entire 'volumes:' section at the very bottom of this file.
-      # - ./prisma:/app/prisma
+      # - ./prisma/dev.db:/app/prisma/dev.db
     restart: unless-stopped
 
 volumes:
@@ -77,6 +77,10 @@ cp docs/Application-Setup_mac.pdf "${RELEASE_DIR}/"
 cp docs/Application-Setup_windows.pdf "${RELEASE_DIR}/"
 cp releases/update-db-schema.sh "${RELEASE_DIR}/" 2>/dev/null || true
 cp releases/update-db-schema.bat "${RELEASE_DIR}/" 2>/dev/null || true
+echo ""
+echo "-> Creating empty prisma directory"
+mkdir -p "${RELEASE_DIR}/prisma"
+touch "${RELEASE_DIR}/prisma/.gitkeep"
 
 echo ""
 echo "-> Creating ZIP archive"
