@@ -142,18 +142,24 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className={styles.hint} style={{ marginTop: '1rem', flexDirection: 'column', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-            <div>
-              <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>US Demo:</span><br/>
-              <code>demoUSA@snapshot.local</code> <span>/</span> <code>DemoUSAPassword123</code>
+        <div className={styles.hint} style={{ marginTop: '1rem', flexDirection: 'column', gap: '0.5rem', alignItems: 'stretch' }}>
+          <details style={{ background: 'var(--bg-input)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)', padding: '0.5rem' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 500, fontSize: '0.85rem' }}>US Demo Credentials</summary>
+            <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <div>UserName: <code>demoUSA@snapshot.local</code></div>
+              <div>Password: <code>DemoUSAPassword123</code></div>
             </div>
-            <div>
-              <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>CA Demo:</span><br/>
-              <code>demoCA@snapshot.local</code> <span>/</span> <code>DemoCAPassword123</code>
+          </details>
+
+          <details style={{ background: 'var(--bg-input)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)', padding: '0.5rem' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 500, fontSize: '0.85rem' }}>CA Demo Credentials</summary>
+            <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <div>UserName: <code>demoCA@snapshot.local</code></div>
+              <div>Password: <code>DemoCAPassword123</code></div>
             </div>
-          </div>
-          <div style={{ marginTop: '0.5rem' }}>
+          </details>
+
+          <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
             <span>Don't have an account?</span>
             <Link href="/register" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 500, marginLeft: '0.5rem' }}>
               Register here
