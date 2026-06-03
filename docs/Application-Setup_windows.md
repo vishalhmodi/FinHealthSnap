@@ -52,10 +52,11 @@ In your PowerShell/Command Prompt window (inside the `FinHealthSnap_App` folder)
 > [!WARNING]
 > **NEVER** click "Run" on the image directly inside the Docker Desktop app. Doing so creates a rogue container that ignores your configuration and will cause port conflicts. Always use the terminal commands below.
 
-In your PowerShell window (still inside the `FinHealthSnap_App` folder), run:
+In your PowerShell window (still inside the `FinHealthSnap_App` folder), run the start script:
 ```cmd
-docker compose up -d
+.\manage-docker.bat
 ```
+This script will automatically detect if the app is already running. If it's not, it will start it for you!
 
 ## Step 6: Access the App
 > [!NOTE]
@@ -65,14 +66,14 @@ docker compose up -d
 2. If you chose Option A (Fresh Start), click "Register" or "Sign Up" to create your new account.
 3. If you chose Option B, log in with your existing credentials.
 
-**To stop the app:** Run `docker compose down` in your PowerShell window.
+**To stop the app:** Run `.\manage-docker.bat` in your PowerShell window again. It will detect the app is running and ask if you want to stop it.
 
 ## How to Restart the App Later
 If you have stopped the app or restarted your computer, follow these steps to bring it back up:
 1. Open **PowerShell** and ensure Docker Desktop is running.
 2. Type `cd ` (with a space at the end) and drag the `FinHealthSnap_App` folder into the PowerShell window, then press Enter.
-3. Run the following command:
+3. Run the helper script:
    ```cmd
-   docker compose up -d
+   .\manage-docker.bat
    ```
 4. Access the app at **[http://localhost:3005](http://localhost:3005)**

@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Navigate to the directory containing docker-compose.yml (the project root)
-cd "$(dirname "$0")/.."
+# Navigate to the directory containing docker-compose.yml
+if [ -f "$(dirname "$0")/docker-compose.yml" ]; then
+    cd "$(dirname "$0")"
+elif [ -f "$(dirname "$0")/../docker-compose.yml" ]; then
+    cd "$(dirname "$0")/.."
+fi
 
 echo "Checking Docker container status..."
 
